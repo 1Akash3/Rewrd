@@ -17,7 +17,7 @@ const nav = [
   ['/dashboard/analytics', 'Analytics', '📈'],
   ['/dashboard/messages', 'Messages', '✉'],
   ['/dashboard/reviews', 'Reviews & Social', '⭐'],
-  ['/dashboard/billing', 'Billing', '💳'],
+  ['/dashboard/billing', 'Account & Plan', '🧾'],
   ['/dashboard/fraud', 'Fraud & Audit', '🛡'],
   ['/dashboard/settings', 'Settings', '⚙'],
 ] as const;
@@ -29,6 +29,27 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [open, setOpen] = useState(false);
 
   if (loading) return <div className="grid min-h-screen place-items-center"><Spinner label="Loading dashboard…" /></div>;
+
+  // Access lock: if the operator suspended or terminated this account, replace the
+  // dashboard with a clear message (the API also blocks all functional calls).
+  if (tenant?.status === 'suspended' || tenant?.status === 'cancelled') {
+    const closed = tenant.status === 'cancelled';
+    return (
+      <div className="grid min-h-screen place-items-center bg-canvas px-5">
+        <div className="card max-w-md p-8 text-center">
+          <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-amber-100 text-3xl">{closed ? '🔒' : '⏸'}</div>
+          <h1 className="mt-5 text-xl font-bold text-ink">{closed ? 'Account closed' : 'Account paused'}</h1>
+          <p className="mt-2 text-sm text-muted">
+            {closed
+              ? 'This account has been closed. Your data is retained. Please contact us if this was a mistake.'
+              : 'Your account is currently paused. Reactivate by completing your plan payment with our team.'}
+          </p>
+          <a href="https://wa.me/910000000000?text=Hi%2C%20I%27d%20like%20to%20reactivate%20my%20Loyalty%20OS%20account" target="_blank" rel="noreferrer" className="btn-brand mt-5 w-full">Contact Loyalty OS</a>
+          <button className="btn-ghost mt-2 w-full text-sm" onClick={() => logoutMerchant(router)}>Log out</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen md:grid md:grid-cols-[248px_1fr]">

@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import { env } from './config/env.js';
 import { attachPrincipal } from './middleware/auth.js';
+import { enforceTenantStatus } from './middleware/tenantStatus.js';
 import { errorHandler, notFoundHandler } from './middleware/error.js';
 import { asyncHandler, ok } from './lib/http.js';
 
@@ -35,6 +36,9 @@ export function createApp() {
 
   const api = express.Router();
   api.use('/auth', authRouter);
+  // Gate every functional endpoint on tenant status (auth stays open above so a
+  // suspended merchant can still log in and see why they're locked out).
+  api.use(enforceTenantStatus);
   api.use('/campaigns', campaignsRouter);
   api.use('/qr', qrRouter);
   api.use('/public', qrPublicRouter); // GET /public/resolve/:token
