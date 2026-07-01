@@ -46,7 +46,7 @@ export default function BillingPage() {
         {plans.map((p) => (
           <Card key={p.id} className={`flex flex-col p-5 ${sub?.plan?.code === p.code ? 'ring-2 ring-brand' : ''}`}>
             <h3 className="font-bold text-ink">{p.name}</h3>
-            <p className="mt-1 text-2xl font-extrabold text-ink">{inr(p.priceYearly)}<span className="text-xs font-normal text-muted">/yr</span></p>
+            <p className="mt-1 text-2xl font-extrabold text-ink">{p.priceYearly > 0 ? <>{inr(p.priceYearly)}<span className="text-xs font-normal text-muted">/yr</span></> : 'Custom'}</p>
             <p className="mt-2 flex-1 text-sm text-muted">{p.maxBranches === -1 ? 'Unlimited' : p.maxBranches} locations · {p.maxCampaigns} campaigns</p>
             <Button variant={sub?.plan?.code === p.code ? 'outline' : 'brand'} disabled={sub?.plan?.code === p.code} className="mt-4" onClick={() => subscribe(p.code)}>
               {sub?.plan?.code === p.code ? 'Current plan' : 'Choose'}

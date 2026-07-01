@@ -19,5 +19,7 @@ export const env = {
   jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '7d',
   otpTtlSeconds: parseInt(process.env.OTP_TTL_SECONDS ?? '300', 10),
   otpDevEcho: (process.env.OTP_DEV_ECHO ?? 'true') === 'true',
+  // Free-trial length in days (merchant "1 month free, then subscribe" model).
+  trialDays: parseInt(process.env.TRIAL_DAYS ?? '30', 10),
   isProd: (process.env.NODE_ENV ?? 'development') === 'production',
 };

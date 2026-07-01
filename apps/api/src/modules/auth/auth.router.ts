@@ -68,7 +68,7 @@ authRouter.post(
                 create: {
                   planId: trialPlan.id,
                   status: 'trialing',
-                  trialEndsAt: new Date(Date.now() + 14 * 864e5),
+                  trialEndsAt: new Date(Date.now() + env.trialDays * 864e5),
                 },
               },
             }

@@ -17,7 +17,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
           </nav>
           <div className="flex items-center gap-2">
             <Link href="/login" className="btn-ghost">Log in</Link>
-            <Link href="/signup" className="btn-brand">Start free trial</Link>
+            <Link href="/start" className="btn-brand">Start free trial</Link>
           </div>
         </div>
       </header>

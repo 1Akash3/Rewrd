@@ -9,11 +9,12 @@ const toJson = (v: unknown) => JSON.stringify(v);
 
 async function main() {
   console.log('Seeding subscription plans...');
+  // Prices in paise (₹1 = 100 paise). Annual billing. 30-day free trial, no card.
   const plans = [
-    { code: 'basic', name: 'Basic', priceYearly: 499900, maxBranches: 1, maxCampaigns: 3, features: { analytics: 'basic', whatsapp: false, whiteLabel: false, api: false } },
-    { code: 'growth', name: 'Growth', priceYearly: 999900, maxBranches: 5, maxCampaigns: 15, features: { analytics: 'advanced', whatsapp: true, whiteLabel: false, api: false } },
-    { code: 'pro', name: 'Pro', priceYearly: 1999900, maxBranches: 20, maxCampaigns: 100, features: { analytics: 'advanced', whatsapp: true, whiteLabel: true, api: true } },
-    { code: 'enterprise', name: 'Enterprise', priceYearly: 4999900, maxBranches: -1, maxCampaigns: 1000, features: { analytics: 'advanced', whatsapp: true, whiteLabel: true, api: true, sso: true } },
+    { code: 'basic', name: 'Basic', priceYearly: 99900, maxBranches: 1, maxCampaigns: 5, features: { stampCards: true, aiMenu: true, scratchCards: true, unlimitedScans: true, analytics: 'standard', freeQrStand: true, gpsBranch: false, whiteLabel: false, api: false } },
+    { code: 'growth', name: 'Growth', priceYearly: 249900, maxBranches: 3, maxCampaigns: 25, features: { stampCards: true, aiMenu: true, scratchCards: true, unlimitedScans: true, analytics: 'branch', freeQrStand: true, sharedQr: true, gpsBranch: true, prioritySupport: true, whiteLabel: false, api: false } },
+    { code: 'pro', name: 'Pro', priceYearly: 499900, maxBranches: 6, maxCampaigns: 100, features: { stampCards: true, aiMenu: true, scratchCards: true, unlimitedScans: true, analytics: 'advanced', freeQrStand: true, sharedQr: true, gpsBranch: true, accountManager: true, whiteLabel: true, api: true } },
+    { code: 'enterprise', name: 'Enterprise', priceYearly: 0, maxBranches: -1, maxCampaigns: 1000, features: { stampCards: true, aiMenu: true, scratchCards: true, unlimitedScans: true, analytics: 'advanced', freeQrStand: true, sharedQr: true, gpsBranch: true, accountManager: true, whiteLabel: true, api: true, sso: true, custom: true } },
   ];
   for (const p of plans) {
     await prisma.subscriptionPlan.upsert({ where: { code: p.code }, update: { ...p, features: toJson(p.features) }, create: { ...p, features: toJson(p.features) } });

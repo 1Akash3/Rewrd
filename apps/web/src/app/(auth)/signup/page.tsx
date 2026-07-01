@@ -35,7 +35,7 @@ export default function SignupPage() {
         {[1, 2].map((s) => <span key={s} className={`h-1.5 flex-1 rounded-full ${s <= step ? 'bg-brand' : 'bg-line'}`} />)}
       </div>
       <h1 className="text-2xl font-bold text-ink">{step === 1 ? 'Tell us about your business' : 'Create your account'}</h1>
-      <p className="mt-1 text-sm text-muted">Step {step} of 2 · 14-day free trial, no card needed.</p>
+      <p className="mt-1 text-sm text-muted">Step {step} of 2 · 30-day free trial, no card needed.</p>
 
       {step === 1 ? (
         <div className="mt-6 space-y-4">
