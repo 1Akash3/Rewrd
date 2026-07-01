@@ -1,0 +1,443 @@
+// Loyalty OS — canonical data model.
+// Runs on SQLite for zero-config local dev; swap `provider` to "postgresql"
+// (and DATABASE_URL) for production. Enum-like fields are stored as String with
+// documented allowed values so the schema is portable across both providers.
+// JSON payloads are stored as String (parse/stringify via src/lib/json.ts).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Tenancy & identity
+// ---------------------------------------------------------------------------
+
+/// A paying merchant business (the unit of tenant isolation). One brand.
+model Tenant {
+  id            String   @id @default(cuid())
+  name          String
+  slug          String   @unique
+  businessType  String   @default("cafe") // cafe|salon|gym|bakery|restaurant|boutique|carwash|other
+  brandColor    String   @default("#4f46e5")
+  logoUrl       String?
+  status        String   @default("trial") // trial|active|past_due|suspended|cancelled
+  gstNumber     String?
+  kycStatus     String   @default("unverified") // unverified|pending|verified|rejected
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  users         User[]
+  branches      Branch[]
+  campaigns     Campaign[]
+  qrCodes       QRCode[]
+  subscription  Subscription?
+  invoices      BillingInvoice[]
+  fraudAlerts   FraudAlert[]
+  auditLogs     AuditLog[]
+  tiers         LoyaltyTier[]
+  menus         DigitalMenu[]
+  tickets       SupportTicket[]
+  templates     NotificationTemplate[]
+}
+
+/// Merchant-side users and platform staff. Platform super-admins have tenantId = null.
+model User {
+  id            String   @id @default(cuid())
+  tenantId      String?
+  tenant        Tenant?  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  branchId      String?
+  branch        Branch?  @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  role          String   @default("owner") // superadmin|owner|branch_manager|staff|support|sales
+  name          String
+  email         String?  @unique
+  phone         String?
+  passwordHash  String?
+  status        String   @default("active") // active|invited|disabled
+  lastLoginAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  stampEvents   StampEvent[]
+  redemptions   RewardRedemption[] @relation("StaffRedemptions")
+  auditLogs     AuditLog[]
+}
+
+/// A physical store location.
+model Branch {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name          String
+  address       String?
+  city          String?
+  lat           Float?
+  lng           Float?
+  geofenceM     Int      @default(200) // geofence radius in metres
+  status        String   @default("active") // active|closed
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  users         User[]
+  qrCodes       QRCode[]
+  stampEvents   StampEvent[]
+}
+
+// ---------------------------------------------------------------------------
+// Customers (global identity — one person can join many businesses)
+// ---------------------------------------------------------------------------
+
+model Customer {
+  id            String   @id @default(cuid())
+  phone         String   @unique
+  name          String?
+  email         String?
+  birthday      DateTime?
+  anniversary   DateTime?
+  consentAt     DateTime?  // marketing/contact consent timestamp (null = no consent)
+  locale        String   @default("en")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  cards         StampCard[]
+  stampEvents   StampEvent[]
+  redemptions   RewardRedemption[]
+  devices       DeviceProfile[]
+  referralsMade Referral[] @relation("Referrer")
+  reviews       ReviewAction[]
+  socials       SocialAction[]
+}
+
+// ---------------------------------------------------------------------------
+// Campaigns & loyalty rules
+// ---------------------------------------------------------------------------
+
+model Campaign {
+  id              String   @id @default(cuid())
+  tenantId        String
+  tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name            String
+  type            String   @default("visit") // visit|purchase|spend|referral|review|social|birthday|welcome|scratch|tiered
+  status          String   @default("active") // draft|active|paused|ended
+  stampsRequired  Int      @default(8)
+  rewardTitle     String   @default("Free item")
+  rewardDetail    String?
+  rewardValidityD Int      @default(30) // reward validity in days after unlock
+  perCustomerDailyLimit Int @default(1)
+  cooldownMinutes Int      @default(60)  // min minutes between stamps for a customer on this campaign
+  requireStaffApproval Boolean @default(false)
+  geoValidation   Boolean  @default(false)
+  branchScope     String   @default("all") // "all" or JSON array of branchIds (string)
+  segmentRules    String?  // JSON string of segmentation rules
+  terms           String?
+  startAt         DateTime?
+  endAt           DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  cards           StampCard[]
+  qrCodes         QRCode[]
+  redemptions     RewardRedemption[]
+  stampEvents     StampEvent[]
+}
+
+// ---------------------------------------------------------------------------
+// QR infrastructure
+// ---------------------------------------------------------------------------
+
+model QRCode {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  branchId      String?
+  branch        Branch?  @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  campaignId    String?
+  campaign      Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  token         String   @unique @default(cuid()) // opaque token embedded in the QR
+  label         String   @default("Store QR")
+  kind          String   @default("store") // store|shared|table|counter|bill|staff
+  status        String   @default("active") // active|revoked
+  scanCount     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  stampEvents   StampEvent[]
+}
+
+// ---------------------------------------------------------------------------
+// Stamp engine
+// ---------------------------------------------------------------------------
+
+model StampCard {
+  id            String   @id @default(cuid())
+  customerId    String
+  customer      Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  campaignId    String
+  campaign      Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  stamps        Int      @default(0)
+  cyclesDone    Int      @default(0) // number of completed reward cycles
+  lastStampAt   DateTime?
+  status        String   @default("active") // active|completed|archived
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  stampEvents   StampEvent[]
+  redemptions   RewardRedemption[]
+
+  @@unique([customerId, campaignId])
+  @@index([campaignId])
+}
+
+model StampEvent {
+  id            String   @id @default(cuid())
+  cardId        String
+  card          StampCard @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  customerId    String
+  customer      Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  campaignId    String
+  campaign      Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  branchId      String?
+  branch        Branch?  @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  qrId          String?
+  qr            QRCode?  @relation(fields: [qrId], references: [id], onDelete: SetNull)
+  staffId       String?
+  staff         User?    @relation(fields: [staffId], references: [id], onDelete: SetNull)
+  delta         Int      @default(1)
+  status        String   @default("granted") // granted|pending|rejected
+  deviceFp      String?
+  lat           Float?
+  lng           Float?
+  reason        String?  // for rejected/pending: fraud reason code
+  createdAt     DateTime @default(now())
+
+  @@index([campaignId, createdAt])
+  @@index([branchId, createdAt])
+}
+
+model RewardRedemption {
+  id            String   @id @default(cuid())
+  cardId        String
+  card          StampCard @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  customerId    String
+  customer      Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  campaignId    String
+  campaign      Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  token         String   @unique @default(cuid()) // shown as QR/barcode to staff
+  status        String   @default("unlocked") // unlocked|claimed|expired|void
+  rewardTitle   String
+  expiresAt     DateTime?
+  claimedAt     DateTime?
+  claimedById   String?
+  claimedBy     User?    @relation("StaffRedemptions", fields: [claimedById], references: [id], onDelete: SetNull)
+  notes         String?
+  createdAt     DateTime @default(now())
+
+  @@index([campaignId, status])
+}
+
+// ---------------------------------------------------------------------------
+// Billing
+// ---------------------------------------------------------------------------
+
+model SubscriptionPlan {
+  id            String   @id @default(cuid())
+  code          String   @unique // basic|growth|pro|enterprise
+  name          String
+  priceYearly   Int      // in paise (INR minor units)
+  maxBranches   Int      // -1 for unlimited
+  maxCampaigns  Int
+  features      String   // JSON string of feature flags
+  createdAt     DateTime @default(now())
+
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id            String   @id @default(cuid())
+  tenantId      String   @unique
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  planId        String
+  plan          SubscriptionPlan @relation(fields: [planId], references: [id])
+  status        String   @default("trialing") // trialing|active|past_due|cancelled
+  trialEndsAt   DateTime?
+  renewsAt      DateTime?
+  couponCode    String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model BillingInvoice {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  number        String   @unique
+  amount        Int      // paise
+  gstAmount     Int      @default(0)
+  status        String   @default("paid") // draft|issued|paid|failed|refunded
+  issuedAt      DateTime @default(now())
+  paidAt        DateTime?
+  lineItems     String   // JSON string
+}
+
+// ---------------------------------------------------------------------------
+// Auth, fraud, devices, analytics, audit
+// ---------------------------------------------------------------------------
+
+model OtpChallenge {
+  id            String   @id @default(cuid())
+  phone         String
+  codeHash      String
+  purpose       String   @default("customer_login") // customer_login|merchant_login
+  attempts      Int      @default(0)
+  expiresAt     DateTime
+  consumedAt    DateTime?
+  createdAt     DateTime @default(now())
+
+  @@index([phone, purpose])
+}
+
+model DeviceProfile {
+  id            String   @id @default(cuid())
+  fingerprint   String   @unique
+  customerId    String?
+  customer      Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  userAgent     String?
+  firstSeenAt   DateTime @default(now())
+  lastSeenAt    DateTime @default(now())
+  riskScore     Int      @default(0)
+}
+
+model FraudAlert {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  kind          String   // velocity|duplicate|geo|shared_device|cooldown|suspicious_branch
+  severity      String   @default("medium") // low|medium|high
+  detail        String   // JSON string context
+  status        String   @default("open") // open|reviewing|dismissed|actioned
+  createdAt     DateTime @default(now())
+
+  @@index([tenantId, status])
+}
+
+model AnalyticsEvent {
+  id            String   @id @default(cuid())
+  tenantId      String?
+  name          String   // event name from the taxonomy
+  branchId      String?
+  campaignId    String?
+  customerId    String?
+  props         String?  // JSON string
+  createdAt     DateTime @default(now())
+
+  @@index([tenantId, name, createdAt])
+}
+
+model AuditLog {
+  id            String   @id @default(cuid())
+  tenantId      String?
+  tenant        Tenant?  @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  actorId       String?
+  actor         User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action        String
+  target        String?
+  meta          String?  // JSON string
+  createdAt     DateTime @default(now())
+
+  @@index([tenantId, createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Growth: referrals, reviews, social, menus, tiers, messaging, support
+// ---------------------------------------------------------------------------
+
+model Referral {
+  id            String   @id @default(cuid())
+  tenantId      String
+  referrerId    String
+  referrer      Customer @relation("Referrer", fields: [referrerId], references: [id], onDelete: Cascade)
+  code          String   @unique
+  invitedPhone  String?
+  status        String   @default("pending") // pending|joined|rewarded
+  createdAt     DateTime @default(now())
+}
+
+model ReviewAction {
+  id            String   @id @default(cuid())
+  tenantId      String
+  customerId    String
+  customer      Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  platform      String   @default("google") // google|other
+  status        String   @default("prompted") // prompted|clicked|submitted
+  createdAt     DateTime @default(now())
+}
+
+model SocialAction {
+  id            String   @id @default(cuid())
+  tenantId      String
+  customerId    String
+  customer      Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  platform      String   // instagram|facebook|youtube|whatsapp
+  status        String   @default("clicked") // clicked|followed
+  createdAt     DateTime @default(now())
+}
+
+model DigitalMenu {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  title         String   @default("Menu")
+  items         String   @default("[]") // JSON string of {name,price,desc,category}
+  aiGenerated   Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model LoyaltyTier {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name          String   // Bronze|Silver|Gold
+  minVisits     Int      @default(0)
+  perks         String?  // JSON string
+  createdAt     DateTime @default(now())
+}
+
+model NotificationTemplate {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  channel       String   // whatsapp|sms|email|push
+  name          String
+  body          String
+  createdAt     DateTime @default(now())
+
+  logs          NotificationLog[]
+}
+
+model NotificationLog {
+  id            String   @id @default(cuid())
+  templateId    String?
+  template      NotificationTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  tenantId      String
+  customerId    String?
+  channel       String
+  status        String   @default("queued") // queued|sent|failed|delivered
+  createdAt     DateTime @default(now())
+}
+
+model SupportTicket {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  subject       String
+  body          String
+  status        String   @default("open") // open|pending|resolved|closed
+  priority      String   @default("normal")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}

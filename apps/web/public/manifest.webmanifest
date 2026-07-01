@@ -1,0 +1,12 @@
+{
+  "name": "Loyalty OS",
+  "short_name": "Loyalty OS",
+  "description": "Collect stamps and unlock rewards from your favourite local businesses.",
+  "start_url": "/app",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
