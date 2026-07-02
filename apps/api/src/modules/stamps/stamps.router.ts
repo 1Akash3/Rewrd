@@ -7,6 +7,7 @@ import { asyncHandler, ok, validate } from '../../lib/http.js';
 import { rateLimit } from '../../middleware/rateLimit.js';
 import { requireCustomer, requireRole } from '../../middleware/auth.js';
 import { evaluateStamp, raiseAlert } from './fraud.js';
+import { pushToCustomer } from '../../lib/push.js';
 
 export const stampsRouter = Router();
 
@@ -133,6 +134,10 @@ async function applyProgress(card: any, campaign: any, delta: number) {
     });
     unlocked = { id: redemption.id, token: redemption.token, rewardTitle: redemption.rewardTitle, expiresAt: redemption.expiresAt };
     await track('reward_unlocked', { tenantId: campaign.tenantId, campaignId: campaign.id, customerId: card.customerId });
+    void pushToCustomer(card.customerId, { title: '🎉 Reward unlocked!', body: `You unlocked "${campaign.rewardTitle}". Show it at the counter to redeem.`, url: '/app/wallet' });
+  } else if (stamps === campaign.stampsRequired - 1) {
+    // "You're 1 stamp away" nudge.
+    void pushToCustomer(card.customerId, { title: 'Almost there!', body: `You're 1 stamp away from "${campaign.rewardTitle}". See you soon!`, url: '/app' });
   }
 
   const updated = await prisma.stampCard.update({

@@ -15,6 +15,10 @@ import { asyncHandler, ok, validate } from '../../lib/http.js';
 import { rateLimit } from '../../middleware/rateLimit.js';
 import { env } from '../../config/env.js';
 import { requireAuth } from '../../middleware/auth.js';
+import { sendOtp } from '../../lib/otp-provider.js';
+import { OAuth2Client } from 'google-auth-library';
+
+const googleClient = new OAuth2Client(env.googleClientId);
 
 export const authRouter = Router();
 
@@ -122,9 +126,8 @@ authRouter.post(
         expiresAt: new Date(Date.now() + env.otpTtlSeconds * 1000),
       },
     });
-    // In production this dispatches via SMS/WhatsApp. In dev we echo it back.
-    // eslint-disable-next-line no-console
-    console.log(`[otp] ${phone} -> ${code}`);
+    // Dispatch via the configured provider (echo in dev, WhatsApp/MSG91/Twilio in prod).
+    await sendOtp(phone, code);
     ok(res, { sent: true, ...(env.otpDevEcho ? { devCode: code } : {}) });
   }),
 );
@@ -159,6 +162,62 @@ authRouter.post(
     await track('customer_login', { customerId: customer.id });
     const token = signToken({ kind: 'customer', id: customer.id, phone: customer.phone });
     ok(res, { token, customer: { id: customer.id, phone: customer.phone, name: customer.name } });
+  }),
+);
+
+/* --------------------- Merchant Google Sign-In (auto-login) --------------- */
+// Frontend uses Google Identity Services, gets an ID token, and posts it here.
+// Existing user -> logged in. New user -> a tenant + owner are auto-provisioned
+// (one-click signup), so merchants never type a password.
+authRouter.post(
+  '/merchant/google',
+  rateLimit({ windowMs: 60_000, max: 20 }),
+  asyncHandler(async (req, res) => {
+    if (!env.googleClientId) throw badRequest('Google Sign-In is not configured on the server.');
+    const { credential } = validate(z.object({ credential: z.string().min(10) }), req.body);
+
+    const ticket = await googleClient.verifyIdToken({ idToken: credential, audience: env.googleClientId });
+    const payload = ticket.getPayload();
+    if (!payload?.email || !payload.email_verified) throw unauthorized('Google account email not verified.');
+
+    let user = await prisma.user.findFirst({
+      where: { OR: [{ googleId: payload.sub }, { email: payload.email }] },
+      include: { tenant: true },
+    });
+
+    if (!user) {
+      // One-click signup: provision a tenant + owner from the Google profile.
+      const displayName = payload.name ?? payload.email.split('@')[0];
+      let slug = slugify(displayName);
+      let n = 1;
+      while (await prisma.tenant.findUnique({ where: { slug } })) slug = `${slugify(displayName)}-${n++}`;
+      const trialPlan = await prisma.subscriptionPlan.findUnique({ where: { code: 'basic' } });
+      const tenant = await prisma.tenant.create({
+        data: {
+          name: `${displayName}'s Business`,
+          slug,
+          status: 'trial',
+          users: { create: { role: 'owner', name: displayName, email: payload.email, googleId: payload.sub, avatarUrl: payload.picture } },
+          branches: { create: { name: 'Main Branch' } },
+          ...(trialPlan ? { subscription: { create: { planId: trialPlan.id, status: 'trialing', trialEndsAt: new Date(Date.now() + env.trialDays * 864e5) } } } : {}),
+        },
+        include: { users: true },
+      });
+      user = { ...tenant.users[0], tenant } as any;
+      await audit({ tenantId: tenant.id, actorId: tenant.users[0].id, action: 'merchant.signup.google', target: tenant.id });
+      await track('merchant_signup', { tenantId: tenant.id, props: { via: 'google' } });
+    } else if (!user.googleId) {
+      // Link Google to an existing password account.
+      await prisma.user.update({ where: { id: user.id }, data: { googleId: payload.sub, avatarUrl: payload.picture } });
+    }
+
+    await prisma.user.update({ where: { id: user!.id }, data: { lastLoginAt: new Date() } });
+    const token = signToken({ kind: 'user', id: user!.id, tenantId: user!.tenantId, role: user!.role, branchId: user!.branchId });
+    ok(res, {
+      token,
+      user: { id: user!.id, name: user!.name, role: user!.role, email: user!.email, avatarUrl: user!.avatarUrl },
+      tenant: user!.tenant ? { id: user!.tenant.id, name: user!.tenant.name, slug: user!.tenant.slug, brandColor: user!.tenant.brandColor } : null,
+    });
   }),
 );
 

@@ -22,6 +22,8 @@ import { fraudRouter } from './modules/fraud/fraud.router.js';
 import { billingRouter } from './modules/billing/billing.router.js';
 import { adminRouter } from './modules/admin/admin.router.js';
 import { growthCustomerRouter, growthMerchantRouter } from './modules/growth/growth.router.js';
+import { notificationsRouter } from './modules/notifications/notifications.router.js';
+import { publicRouter } from './modules/public/public.router.js';
 
 export function createApp() {
   const app = express();
@@ -42,6 +44,8 @@ export function createApp() {
   api.use('/campaigns', campaignsRouter);
   api.use('/qr', qrRouter);
   api.use('/public', qrPublicRouter); // GET /public/resolve/:token
+  api.use('/public', publicRouter); // GET /public/nearest-branch, /public/geocode
+  api.use('/notifications', notificationsRouter);
   api.use('/stamps', stampsRouter);
   api.use('/rewards', rewardsRouter);
   api.use('/me', customerRouter); // customer self-service

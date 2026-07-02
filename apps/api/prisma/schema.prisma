@@ -9,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -57,6 +57,8 @@ model User {
   email         String?  @unique
   phone         String?
   passwordHash  String?
+  googleId      String?  @unique // set when the user signs in with Google
+  avatarUrl     String?
   status        String   @default("active") // active|invited|disabled
   lastLoginAt   DateTime?
   createdAt     DateTime @default(now())
@@ -110,6 +112,20 @@ model Customer {
   referralsMade Referral[] @relation("Referrer")
   reviews       ReviewAction[]
   socials       SocialAction[]
+  pushSubs      PushSubscription[]
+}
+
+/// A browser Web Push subscription for PWA notifications.
+model PushSubscription {
+  id            String   @id @default(cuid())
+  customerId    String
+  customer      Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  endpoint      String   @unique
+  p256dh        String
+  auth          String
+  createdAt     DateTime @default(now())
+
+  @@index([customerId])
 }
 
 // ---------------------------------------------------------------------------

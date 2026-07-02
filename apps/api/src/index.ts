@@ -1,3 +1,6 @@
+import { initObservability } from './lib/observability.js';
+initObservability(); // must run before other imports create handlers
+
 import { createApp } from './app.js';
 import { env } from './config/env.js';
 

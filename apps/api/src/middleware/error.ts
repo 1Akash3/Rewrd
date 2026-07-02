@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
 import { AppError } from '../lib/errors.js';
+import { captureError } from '../lib/observability.js';
 
 export function notFoundHandler(_req: Request, res: Response) {
   res.status(404).json({ ok: false, error: { code: 'not_found', message: 'Route not found' } });
@@ -24,6 +25,7 @@ export function errorHandler(
     res.status(409).json({ ok: false, error: { code: 'conflict', message: 'Resource already exists' } });
     return;
   }
+  captureError(err); // report to Sentry when configured
   // eslint-disable-next-line no-console
   console.error('[unhandled]', err);
   res.status(500).json({ ok: false, error: { code: 'internal', message: 'Internal server error' } });
