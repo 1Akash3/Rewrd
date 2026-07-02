@@ -17,6 +17,9 @@ export const env = {
     .filter(Boolean),
   jwtSecret: req('JWT_SECRET', 'dev-super-secret-change-me'),
   jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '7d',
+  // Customers stay logged in long-term so a returning scan never re-verifies —
+  // they pay the SMS-OTP cost only on their very first scan.
+  customerJwtExpiresIn: process.env.CUSTOMER_JWT_EXPIRES_IN ?? '180d',
   otpTtlSeconds: parseInt(process.env.OTP_TTL_SECONDS ?? '300', 10),
   otpDevEcho: (process.env.OTP_DEV_ECHO ?? 'true') === 'true',
   // Free-trial length in days (merchant "1 month free, then subscribe" model).

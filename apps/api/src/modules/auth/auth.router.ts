@@ -136,8 +136,8 @@ authRouter.post(
   '/customer/otp/verify',
   rateLimit({ windowMs: 60_000, max: 10, key: (r) => (r.body?.phone ?? r.ip) as string }),
   asyncHandler(async (req, res) => {
-    const { phone, code, name } = validate(
-      z.object({ phone: z.string().min(6), code: z.string().length(6), name: z.string().optional() }),
+    const { phone, code, name, email } = validate(
+      z.object({ phone: z.string().min(6), code: z.string().length(6), name: z.string().optional(), email: z.string().email().optional() }),
       req.body,
     );
     const challenge = await prisma.otpChallenge.findFirst({
@@ -156,8 +156,8 @@ authRouter.post(
 
     const customer = await prisma.customer.upsert({
       where: { phone },
-      update: name ? { name } : {},
-      create: { phone, name },
+      update: { ...(name ? { name } : {}), ...(email ? { email } : {}) },
+      create: { phone, name, email },
     });
     await track('customer_login', { customerId: customer.id });
     const token = signToken({ kind: 'customer', id: customer.id, phone: customer.phone });

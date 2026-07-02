@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet">
+<style>* { box-sizing:border-box; } body { margin:0; } .rw-s::-webkit-scrollbar{width:8px;} .rw-s::-webkit-scrollbar-thumb{background:#3a3a3d;border-radius:8px;}</style>
+</helmet>
+<div style="font-family:'General Sans',sans-serif; background:#141416; color:#f4f2ee; min-height:100vh; -webkit-font-smoothing:antialiased;">
+
+  <!-- top bar -->
+  <header style="background:#1A1A1B; border-bottom:1.5px solid #2c2c2f; padding:14px 28px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:20;">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <div style="width:34px; height:34px; background:#F74445; border-radius:9px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:17px;">✦</div>
+      <div><span style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:18px;">rewrd</span> <span style="color:#7a756d; font-weight:500; font-size:14px;">· Platform Admin</span></div>
+    </div>
+    <div style="display:flex; align-items:center; gap:14px;">
+      <span style="font-size:12.5px; font-weight:600; background:#2c2c2f; color:#D5F170; padding:6px 12px; border-radius:999px;">Operator</span>
+      <div style="width:34px; height:34px; border-radius:50%; background:#7C44BD; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:13px;">OP</div>
+    </div>
+  </header>
+
+  <!-- tabs -->
+  <div style="background:#1A1A1B; padding:0 28px; display:flex; gap:4px; border-bottom:1.5px solid #2c2c2f; position:sticky; top:63px; z-index:19;">
+    <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
+      <button onClick="{{ t.onClick }}" style="border:none; background:transparent; cursor:pointer; font-family:inherit; font-weight:600; font-size:14px; padding:14px 16px; color:{{ t.fg }}; border-bottom:3px solid {{ t.bar }};">{{ t.label }}</button>
+    </sc-for>
+  </div>
+
+  <main style="padding:28px; max-width:1240px; margin:0 auto;">
+
+    <!-- OVERVIEW -->
+    <sc-if value="{{ isOverview }}" hint-placeholder-val="{{ true }}">
+    <div>
+      <div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:26px; margin-bottom:18px;">Platform overview</div>
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px;">
+        <div style="background:#1e1e21; border:1.5px solid #2c2c2f; border-radius:16px; padding:20px;"><div style="font-size:13px; color:#9a948a;">Merchants</div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:32px;">1,284</div><div style="font-size:12px; color:#9a948a;"><span style="color:#34AD6C;">892 active</span> · 392 trial</div></div>
+        <div style="background:#1e1e21; border:1.5px solid #2c2c2f; border-radius:16px; padding:20px;"><div style="font-size:13px; color:#9a948a;">Customers</div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:32px;">418k</div><div style="font-size:12px; color:#34AD6C;">▲ 6.2% this month</div></div>
+        <div style="background:#1e1e21; border:1.5px solid #2c2c2f; border-radius:16px; padding:20px;"><div style="font-size:13px; color:#9a948a;">Stamps issued</div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:32px;">3.1M</div><div style="font-size:12px; color:#9a948a;">all-time</div></div>
+        <div style="background:#241a2e; border:1.5px solid #4a2f68; border-radius:16px; padding:20px;"><div style="font-size:13px; color:#c6a8e6;">ARR</div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:32px; color:#D5F170;">₹3.2Cr</div><div style="font-size:12px; color:#c6a8e6;">▲ 11%</div></div>
+      </div>
+      <div style="background:#1e1e21; border:1.5px solid #2c2c2f; border-radius:16px; padding:20px; margin-top:16px;">
+        <div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:16px; margin-bottom:16px;">New merchants · last 12 weeks</div>
+        <div style="height:130px; display:flex; align-items:flex-end; gap:8px;"><div style="flex:1; background:#7C44BD; border-radius:5px 5px 0 0; height:40%;"></div><div style="flex:1; background:#7C44BD; border-radius:5px 5px 0 0; height:55%;"></div><div style="flex:1; background:#7C44BD; border-radius:5px 5px 0 0; height:48%;"></div><div style="flex:1; background:#7C44BD; border-radius:5px 5px 0 0; height:68%;"></div><div style="flex:1; background:#7C44BD; border-radius:5px 5px 0 0; height:60%;"></div><div style="flex:1; background:#7C44BD; border-radius:5px 5px 0 0; height:80%;"></div><div style="flex:1; background:#7C44BD; border-radius:5px 5px 0 0; height:72%;"></div><div style="flex:1; background:#9563cc; border-radius:5px 5px 0 0; height:88%;"></div><div style="flex:1; background:#9563cc; border-radius:5px 5px 0 0; height:76%;"></div><div style="flex:1; background:#9563cc; border-radius:5px 5px 0 0; height:92%;"></div><div style="flex:1; background:#D5F170; border-radius:5px 5px 0 0; height:100%;"></div><div style="flex:1; background:#D5F170; border-radius:5px 5px 0 0; height:84%;"></div></div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- MERCHANTS -->
+    <sc-if value="{{ isMerchants }}" hint-placeholder-val="{{ false }}">
+    <div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <input placeholder="Search merchants…" style="width:320px; border:1.5px solid #2c2c2f; background:#1e1e21; color:#f4f2ee; border-radius:10px; padding:11px 14px; font-family:inherit; font-size:14px;">
+        <div style="font-size:13px; color:#9a948a;">1,284 merchants</div>
+      </div>
+      <div style="background:#1e1e21; border:1.5px solid #2c2c2f; border-radius:16px; padding:20px;">
+        <div style="display:grid; grid-template-columns:1.8fr 0.9fr 1fr 0.8fr 1.6fr; font-size:11.5px; color:#7a756d; font-weight:600; padding-bottom:12px; border-bottom:1.5px solid #2c2c2f;"><span>BUSINESS</span><span>PLAN</span><span>STATUS</span><span>KYC</span><span>MANAGE ACCESS</span></div>
+        <sc-for list="{{ merchants }}" as="m" hint-placeholder-count="5">
+          <div style="display:grid; grid-template-columns:1.8fr 0.9fr 1fr 0.8fr 1.6fr; align-items:center; padding:14px 0; border-bottom:1px solid #262629;">
+            <span><span style="font-weight:600; font-size:14px;">{{ m.name }}</span><span style="display:block; font-size:12px; color:#7a756d;">{{ m.slug }} · {{ m.branches }} branches</span></span>
+            <span style="font-size:13.5px;">{{ m.plan }}</span>
+            <span><span style="font-size:11px; font-weight:600; padding:3px 9px; border-radius:999px; background:{{ m.stBg }}; color:{{ m.stFg }};">{{ m.status }}</span></span>
+            <span><sc-if value="{{ m.kycOk }}" hint-placeholder-val="{{ true }}"><span style="color:#34AD6C; font-size:13px;">✓ Verified</span></sc-if><sc-if value="{{ m.kycBad }}" hint-placeholder-val="{{ false }}"><button style="border:1.5px solid #4a2f68; background:transparent; color:#c6a8e6; border-radius:8px; padding:5px 10px; font-size:12px; font-weight:600; cursor:pointer;">Verify</button></sc-if></span>
+            <span style="display:flex; gap:6px;"><button style="border:none; background:#1c7a4d; color:#fff; border-radius:8px; padding:6px 11px; font-size:12px; font-weight:600; cursor:pointer;">Activate</button><button style="border:none; background:#9a7a12; color:#fff; border-radius:8px; padding:6px 11px; font-size:12px; font-weight:600; cursor:pointer;">Suspend</button><button style="border:none; background:#d0362c; color:#fff; border-radius:8px; padding:6px 11px; font-size:12px; font-weight:600; cursor:pointer;">Terminate</button></span>
+          </div>
+        </sc-for>
+        <div style="font-size:12.5px; color:#7a756d; margin-top:14px; line-height:1.5;">Suspend pauses a merchant instantly; Terminate closes the account. Collect payment via UPI and grant / renew access here.</div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- FRAUD QUEUE -->
+    <sc-if value="{{ isFraud }}" hint-placeholder-val="{{ false }}">
+    <div>
+      <div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:22px; margin-bottom:16px;">Fraud queue <span style="font-size:14px; color:#7a756d; font-weight:500;">· across all merchants</span></div>
+      <div style="background:#1e1e21; border:1.5px solid #2c2c2f; border-radius:16px; padding:20px;">
+        <div style="display:grid; grid-template-columns:1.6fr 1.2fr 0.8fr 1fr 1fr; font-size:11.5px; color:#7a756d; font-weight:600; padding-bottom:12px; border-bottom:1.5px solid #2c2c2f;"><span>BUSINESS</span><span>TYPE</span><span>SEVERITY</span><span>TIME</span><span>ACTION</span></div>
+        <div style="display:grid; grid-template-columns:1.6fr 1.2fr 0.8fr 1fr 1fr; align-items:center; padding:14px 0; border-bottom:1px solid #262629; font-size:13.5px;"><span style="font-weight:600;">Brew &amp; Bean</span><span style="color:#c6c1b8;">Velocity</span><span><span style="font-size:11px; font-weight:600; background:#3a1e1c; color:#f08b83; padding:3px 9px; border-radius:999px;">High</span></span><span style="color:#9a948a;">4 min ago</span><span><button style="border:1.5px solid #2c2c2f; background:transparent; color:#f4f2ee; border-radius:8px; padding:6px 12px; font-size:12px; font-weight:600; cursor:pointer;">Review</button></span></div>
+        <div style="display:grid; grid-template-columns:1.6fr 1.2fr 0.8fr 1fr 1fr; align-items:center; padding:14px 0; border-bottom:1px solid #262629; font-size:13.5px;"><span style="font-weight:600;">Glow Salon</span><span style="color:#c6c1b8;">Shared device</span><span><span style="font-size:11px; font-weight:600; background:#3a2f10; color:#e6c860; padding:3px 9px; border-radius:999px;">Med</span></span><span style="color:#9a948a;">22 min ago</span><span><button style="border:1.5px solid #2c2c2f; background:transparent; color:#f4f2ee; border-radius:8px; padding:6px 12px; font-size:12px; font-weight:600; cursor:pointer;">Review</button></span></div>
+        <div style="display:grid; grid-template-columns:1.6fr 1.2fr 0.8fr 1fr 1fr; align-items:center; padding:14px 0; font-size:13.5px;"><span style="font-weight:600;">FitZone Gym</span><span style="color:#c6c1b8;">Geo mismatch</span><span><span style="font-size:11px; font-weight:600; background:#26262a; color:#9a948a; padding:3px 9px; border-radius:999px;">Low</span></span><span style="color:#9a948a;">1 hr ago</span><span><button style="border:1.5px solid #2c2c2f; background:transparent; color:#f4f2ee; border-radius:8px; padding:6px 12px; font-size:12px; font-weight:600; cursor:pointer;">Review</button></span></div>
+      </div>
+    </div>
+    </sc-if>
+
+    <div style="margin-top:24px;"><a href="Rewrd Landing.dc.html" style="color:#7a756d; font-size:13px; text-decoration:none;">↩ Back to site</a></div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1240,&quot;height&quot;:820}}">
+class Component extends DCLogic {
+  state = { view: 'overview' };
+  renderVals() {
+    const v = this.state.view;
+    const mk = (id, label) => {
+      const active = v === id;
+      return { label, fg: active ? '#fff' : '#7a756d', bar: active ? '#7C44BD' : 'transparent',
+        onClick: () => this.setState({ view:id }) };
+    };
+    const merchants = [
+      { name:'Brew & Bean', slug:'brew-bean', branches:3, plan:'Pro', status:'Trial', stBg:'#3a2f10', stFg:'#e6c860', kycOk:true, kycBad:false },
+      { name:'Glow Salon', slug:'glow-salon', branches:2, plan:'Growth', status:'Active', stBg:'#12331f', stFg:'#5fd694', kycOk:true, kycBad:false },
+      { name:'Sweet Crumbs', slug:'sweet-crumbs', branches:1, plan:'Basic', status:'Active', stBg:'#12331f', stFg:'#5fd694', kycOk:false, kycBad:true },
+      { name:'FitZone Gym', slug:'fitzone', branches:4, plan:'Pro', status:'Suspended', stBg:'#3a1e1c', stFg:'#f08b83', kycOk:true, kycBad:false },
+      { name:'Shine Car Wash', slug:'shine-wash', branches:2, plan:'Growth', status:'Cancelled', stBg:'#26262a', stFg:'#9a948a', kycOk:false, kycBad:true }
+    ];
+    return {
+      tabs: [ mk('overview','Overview'), mk('merchants','Merchants · Manage access'), mk('fraud','Fraud queue') ],
+      isOverview:v==='overview', isMerchants:v==='merchants', isFraud:v==='fraud',
+      merchants
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -7,7 +7,10 @@ export type Principal =
   | { kind: 'customer'; id: string; phone: string };
 
 export function signToken(principal: Principal): string {
-  return jwt.sign(principal, env.jwtSecret, { expiresIn: env.jwtExpiresIn as any });
+  // Customers get a long-lived session (stay logged in across visits); merchant
+  // users get a shorter one for dashboard security.
+  const expiresIn = principal.kind === 'customer' ? env.customerJwtExpiresIn : env.jwtExpiresIn;
+  return jwt.sign(principal, env.jwtSecret, { expiresIn: expiresIn as any });
 }
 
 export function verifyToken(token: string): Principal {

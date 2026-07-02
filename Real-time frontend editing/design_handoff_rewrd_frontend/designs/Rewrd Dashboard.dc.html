@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  .rw-scroll::-webkit-scrollbar { width: 8px; height:8px; }
+  .rw-scroll::-webkit-scrollbar-thumb { background:#ddd6cc; border-radius:8px; }
+</style>
+</helmet>
+<div style="font-family:'General Sans',sans-serif; background:#F5F1EA; color:#1A1A1B; min-height:100vh; -webkit-font-smoothing:antialiased;">
+
+<sc-if value="{{ notPaused }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex; min-height:100vh;">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside style="width:250px; flex-shrink:0; background:#fff; border-right:1.5px solid #ebe5db; padding:20px 16px; display:flex; flex-direction:column; gap:18px; position:sticky; top:0; height:100vh;">
+    <div style="display:flex; align-items:center; gap:10px; padding:4px 6px;">
+      <div style="width:36px; height:36px; background:#F74445; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:18px;">✦</div>
+      <div>
+        <div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:16px; line-height:1;">Brew &amp; Bean</div>
+        <div style="font-size:11px; color:#9a948a;">rewrd merchant</div>
+      </div>
+    </div>
+
+    <div class="rw-scroll" style="overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:16px;">
+      <div>
+        <div style="font-size:10.5px; font-weight:600; letter-spacing:0.08em; color:#b4ada2; padding:0 8px 6px;">MAIN</div>
+        <div style="display:flex; flex-direction:column; gap:2px;">
+          <sc-for list="{{ navMain }}" as="item" hint-placeholder-count="7">
+            <button onClick="{{ item.onClick }}" style="display:flex; align-items:center; gap:11px; width:100%; border:none; cursor:pointer; font-family:inherit; font-size:14px; font-weight:{{ item.weight }}; text-align:left; padding:9px 10px; border-radius:10px; background:{{ item.bg }}; color:{{ item.fg }};">
+              <span style="font-size:15px; width:18px; text-align:center;">{{ item.icon }}</span> {{ item.label }}
+            </button>
+          </sc-for>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10.5px; font-weight:600; letter-spacing:0.08em; color:#b4ada2; padding:0 8px 6px;">INSIGHTS</div>
+        <div style="display:flex; flex-direction:column; gap:2px;">
+          <sc-for list="{{ navInsights }}" as="item" hint-placeholder-count="3">
+            <button onClick="{{ item.onClick }}" style="display:flex; align-items:center; gap:11px; width:100%; border:none; cursor:pointer; font-family:inherit; font-size:14px; font-weight:{{ item.weight }}; text-align:left; padding:9px 10px; border-radius:10px; background:{{ item.bg }}; color:{{ item.fg }};">
+              <span style="font-size:15px; width:18px; text-align:center;">{{ item.icon }}</span> {{ item.label }}
+            </button>
+          </sc-for>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10.5px; font-weight:600; letter-spacing:0.08em; color:#b4ada2; padding:0 8px 6px;">ACCOUNT</div>
+        <div style="display:flex; flex-direction:column; gap:2px;">
+          <sc-for list="{{ navAccount }}" as="item" hint-placeholder-count="3">
+            <button onClick="{{ item.onClick }}" style="display:flex; align-items:center; gap:11px; width:100%; border:none; cursor:pointer; font-family:inherit; font-size:14px; font-weight:{{ item.weight }}; text-align:left; padding:9px 10px; border-radius:10px; background:{{ item.bg }}; color:{{ item.fg }};">
+              <span style="font-size:15px; width:18px; text-align:center;">{{ item.icon }}</span> {{ item.label }}
+            </button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <a href="Rewrd Landing.dc.html" style="text-decoration:none; display:flex; align-items:center; gap:8px; font-size:13px; color:#9a948a; padding:8px 10px; border-top:1.5px solid #ebe5db;">↩ Back to site</a>
+  </aside>
+
+  <!-- ===== MAIN COLUMN ===== -->
+  <div style="flex:1; min-width:0; display:flex; flex-direction:column; height:100vh;">
+    <!-- Top bar -->
+    <header style="background:#fff; border-bottom:1.5px solid #ebe5db; padding:16px 28px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:10;">
+      <h1 style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:22px; margin:0;">{{ title }}</h1>
+      <div style="display:flex; align-items:center; gap:16px;">
+        <span style="display:inline-flex; align-items:center; gap:6px; background:#FDF3D9; color:#9a7a12; font-weight:600; font-size:12.5px; padding:6px 12px; border-radius:999px;">● Trial · 21 days left</span>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:36px; height:36px; border-radius:50%; background:#7C44BD; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:14px;">AK</div>
+          <div style="line-height:1.15;">
+            <div style="font-weight:600; font-size:13.5px;">Aarav Kapoor</div>
+            <div style="font-size:11.5px; color:#9a948a;">Owner</div>
+          </div>
+        </div>
+        <button style="border:1.5px solid #ebe5db; background:#fff; cursor:pointer; font-family:inherit; font-size:13px; font-weight:600; color:#5a554d; padding:8px 14px; border-radius:10px;">Log out</button>
+      </div>
+    </header>
+
+    <!-- Scrollable content -->
+    <main class="rw-scroll" style="flex:1; overflow-y:auto; padding:28px;">
+
+      <!-- ========== OVERVIEW ========== -->
+      <sc-if value="{{ isOverview }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <div style="margin-bottom:22px;">
+          <div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:26px;">Good morning, Aarav 👋</div>
+          <div style="color:#7a756d; font-size:15px;">Here's how your loyalty program is doing today.</div>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:14px;">
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:18px;"><div style="font-size:12.5px; color:#8a857c;">Today's scans</div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:30px;">128</div><div style="font-size:12px; color:#34AD6C; font-weight:600;">▲ 12% vs yesterday</div></div>
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:18px;"><div style="font-size:12.5px; color:#8a857c;">This week's scans</div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:30px;">842</div><div style="font-size:12px; color:#34AD6C; font-weight:600;">▲ 8%</div></div>
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:18px;"><div style="font-size:12.5px; color:#8a857c;">Active customers</div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:30px;">892</div><div style="font-size:12px; color:#8a857c;">across 3 branches</div></div>
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:18px;"><div style="font-size:12.5px; color:#8a857c;">Repeat customers</div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:30px;">61%</div><div style="font-size:12px; color:#34AD6C; font-weight:600;">▲ 4%</div></div>
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:18px;"><div style="font-size:12.5px; color:#8a857c;">Rewards unlocked</div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:30px;">43</div><div style="font-size:12px; color:#8a857c;">this week</div></div>
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:18px;"><div style="font-size:12.5px; color:#8a857c;">Redemption rate</div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:30px;">74%</div><div style="font-size:12px; color:#34AD6C; font-weight:600;">healthy</div></div>
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:18px;"><div style="font-size:12.5px; color:#8a857c;">Avg visits / customer</div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:30px;">4.3</div><div style="font-size:12px; color:#8a857c;">last 30 days</div></div>
+          <div style="background:#FDECEC; border:1.5px solid #F7c9c9; border-radius:16px; padding:18px;"><div style="font-size:12.5px; color:#b0574f;">Open fraud alerts</div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:30px; color:#d0362c;">2</div><div style="font-size:12px; color:#b0574f; font-weight:600;">needs review</div></div>
+        </div>
+
+        <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:20px; margin-top:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;"><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:16px;">14-day scan trend</div><span style="font-size:12px; color:#8a857c;">Total 1,206 scans</span></div>
+          <div style="height:150px; display:flex; align-items:flex-end; gap:7px;">
+            <div style="flex:1; background:#EEE3FA; border-radius:5px 5px 0 0; height:44%;"></div><div style="flex:1; background:#EEE3FA; border-radius:5px 5px 0 0; height:52%;"></div><div style="flex:1; background:#EEE3FA; border-radius:5px 5px 0 0; height:38%;"></div><div style="flex:1; background:#EEE3FA; border-radius:5px 5px 0 0; height:61%;"></div><div style="flex:1; background:#EEE3FA; border-radius:5px 5px 0 0; height:55%;"></div><div style="flex:1; background:#EEE3FA; border-radius:5px 5px 0 0; height:70%;"></div><div style="flex:1; background:#EEE3FA; border-radius:5px 5px 0 0; height:48%;"></div><div style="flex:1; background:#EEE3FA; border-radius:5px 5px 0 0; height:66%;"></div><div style="flex:1; background:#EEE3FA; border-radius:5px 5px 0 0; height:72%;"></div><div style="flex:1; background:#EEE3FA; border-radius:5px 5px 0 0; height:59%;"></div><div style="flex:1; background:#7C44BD; border-radius:5px 5px 0 0; height:83%;"></div><div style="flex:1; background:#7C44BD; border-radius:5px 5px 0 0; height:77%;"></div><div style="flex:1; background:#7C44BD; border-radius:5px 5px 0 0; height:91%;"></div><div style="flex:1; background:#7C44BD; border-radius:5px 5px 0 0; height:100%;"></div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:20px;">
+            <div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:16px; margin-bottom:16px;">New vs returning</div>
+            <div style="display:flex; align-items:center; gap:24px;">
+              <div style="width:120px; height:120px; border-radius:50%; background:conic-gradient(#7C44BD 0 61%, #F0D80B 61% 100%); display:flex; align-items:center; justify-content:center;"><div style="width:72px; height:72px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:20px;">892</div></div>
+              <div style="display:flex; flex-direction:column; gap:10px;">
+                <div style="display:flex; align-items:center; gap:8px; font-size:14px;"><span style="width:12px; height:12px; border-radius:3px; background:#7C44BD;"></span> Returning · 61%</div>
+                <div style="display:flex; align-items:center; gap:8px; font-size:14px;"><span style="width:12px; height:12px; border-radius:3px; background:#F0D80B;"></span> New · 39%</div>
+              </div>
+            </div>
+          </div>
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:20px;">
+            <div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:16px; margin-bottom:16px;">Popular visit hours</div>
+            <div style="height:110px; display:flex; align-items:flex-end; gap:8px;">
+              <div style="flex:1; background:#F06706; border-radius:4px 4px 0 0; height:30%;"></div><div style="flex:1; background:#F06706; border-radius:4px 4px 0 0; height:70%;"></div><div style="flex:1; background:#F06706; border-radius:4px 4px 0 0; height:95%;"></div><div style="flex:1; background:#f9b98a; border-radius:4px 4px 0 0; height:50%;"></div><div style="flex:1; background:#f9b98a; border-radius:4px 4px 0 0; height:42%;"></div><div style="flex:1; background:#F06706; border-radius:4px 4px 0 0; height:80%;"></div><div style="flex:1; background:#F06706; border-radius:4px 4px 0 0; height:88%;"></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:11px; color:#a49e94; margin-top:6px;"><span>8a</span><span>10a</span><span>12p</span><span>2p</span><span>4p</span><span>6p</span><span>8p</span></div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1.3fr 1fr; gap:16px; margin-top:16px;">
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:20px;">
+            <div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:16px; margin-bottom:14px;">Top campaigns</div>
+            <div style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr; font-size:11.5px; color:#a49e94; font-weight:600; padding-bottom:8px; border-bottom:1.5px solid #f0ece4;"><span>CAMPAIGN</span><span>STAMPS</span><span>REWARDS</span><span>CUSTOMERS</span></div>
+            <div style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr; font-size:14px; padding:11px 0; border-bottom:1px solid #f5f2ec;"><span style="font-weight:600;">Free Coffee After 8 Visits</span><span>3,204</span><span>287</span><span>612</span></div>
+            <div style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr; font-size:14px; padding:11px 0; border-bottom:1px solid #f5f2ec;"><span style="font-weight:600;">Buy 9 Get 1 Free Pastry</span><span>1,890</span><span>142</span><span>388</span></div>
+            <div style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr; font-size:14px; padding:11px 0;"><span style="font-weight:600;">Weekend Double Stamp</span><span>960</span><span>—</span><span>241</span></div>
+          </div>
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:20px;">
+            <div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:16px; margin-bottom:14px;">Recent activity</div>
+            <div style="display:flex; flex-direction:column; gap:14px;">
+              <div style="display:flex; gap:10px; font-size:13px;"><span style="width:8px; height:8px; border-radius:50%; background:#34AD6C; margin-top:5px;"></span><div><div>Priya M. unlocked <b>Free Cappuccino</b></div><div style="color:#a49e94; font-size:11.5px;">MG Road · 4 min ago</div></div></div>
+              <div style="display:flex; gap:10px; font-size:13px;"><span style="width:8px; height:8px; border-radius:50%; background:#7C44BD; margin-top:5px;"></span><div><div>New customer joined via QR</div><div style="color:#a49e94; font-size:11.5px;">Indiranagar · 12 min ago</div></div></div>
+              <div style="display:flex; gap:10px; font-size:13px;"><span style="width:8px; height:8px; border-radius:50%; background:#F0D80B; margin-top:5px;"></span><div><div>Reward <b>Free Muffin</b> claimed</div><div style="color:#a49e94; font-size:11.5px;">MG Road · 28 min ago</div></div></div>
+              <div style="display:flex; gap:10px; font-size:13px;"><span style="width:8px; height:8px; border-radius:50%; background:#F74445; margin-top:5px;"></span><div><div>Velocity alert flagged</div><div style="color:#a49e94; font-size:11.5px;">Koramangala · 41 min ago</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ========== CAMPAIGNS ========== -->
+      <sc-if value="{{ isCampaigns }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+          <div style="color:#7a756d; font-size:15px;">5 campaigns · 3 active</div>
+          <button style="background:#7C44BD; color:#fff; border:none; cursor:pointer; font-family:inherit; font-weight:600; font-size:14px; padding:11px 18px; border-radius:11px;">+ New campaign</button>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:16px;">
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:20px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;"><div><span style="font-size:11px; font-weight:600; background:#EEE3FA; color:#7C44BD; padding:3px 9px; border-radius:999px;">VISIT</span> <span style="font-size:11px; font-weight:600; background:#DFF5E9; color:#1c7a4d; padding:3px 9px; border-radius:999px;">● Active</span><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:19px; margin-top:10px;">Free Coffee After 8 Visits</div></div><button style="border:1.5px solid #ebe5db; background:#fff; border-radius:9px; padding:7px 12px; font-size:12.5px; font-weight:600; cursor:pointer;">Edit</button></div>
+            <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:16px;"><div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:18px;">3,204</div><div style="font-size:11px; color:#a49e94;">Scans</div></div><div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:18px;">78%</div><div style="font-size:11px; color:#a49e94;">Completion</div></div><div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:18px;">287</div><div style="font-size:11px; color:#a49e94;">Redeemed</div></div><div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:18px;">612</div><div style="font-size:11px; color:#a49e94;">Members</div></div></div>
+            <div style="font-size:12px; color:#8a857c; margin-top:12px;">Available at: All 3 branches</div>
+          </div>
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:20px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;"><div><span style="font-size:11px; font-weight:600; background:#FDECEC; color:#d0362c; padding:3px 9px; border-radius:999px;">PURCHASE</span> <span style="font-size:11px; font-weight:600; background:#DFF5E9; color:#1c7a4d; padding:3px 9px; border-radius:999px;">● Active</span><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:19px; margin-top:10px;">Buy 9, Get 1 Free Pastry</div></div><button style="border:1.5px solid #ebe5db; background:#fff; border-radius:9px; padding:7px 12px; font-size:12.5px; font-weight:600; cursor:pointer;">Edit</button></div>
+            <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:16px;"><div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:18px;">1,890</div><div style="font-size:11px; color:#a49e94;">Scans</div></div><div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:18px;">64%</div><div style="font-size:11px; color:#a49e94;">Completion</div></div><div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:18px;">142</div><div style="font-size:11px; color:#a49e94;">Redeemed</div></div><div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:18px;">388</div><div style="font-size:11px; color:#a49e94;">Members</div></div></div>
+            <div style="font-size:12px; color:#8a857c; margin-top:12px;">Available at: MG Road, Indiranagar</div>
+          </div>
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:20px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;"><div><span style="font-size:11px; font-weight:600; background:#FEF6D6; color:#9a7a12; padding:3px 9px; border-radius:999px;">SPEND</span> <span style="font-size:11px; font-weight:600; background:#F1EEE9; color:#7a756d; padding:3px 9px; border-radius:999px;">❚❚ Paused</span><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:19px; margin-top:10px;">Weekend Double Stamp</div></div><button style="border:1.5px solid #ebe5db; background:#fff; border-radius:9px; padding:7px 12px; font-size:12.5px; font-weight:600; cursor:pointer;">Edit</button></div>
+            <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:16px;"><div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:18px;">960</div><div style="font-size:11px; color:#a49e94;">Scans</div></div><div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:18px;">—</div><div style="font-size:11px; color:#a49e94;">Completion</div></div><div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:18px;">—</div><div style="font-size:11px; color:#a49e94;">Redeemed</div></div><div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:18px;">241</div><div style="font-size:11px; color:#a49e94;">Members</div></div></div>
+            <div style="font-size:12px; color:#8a857c; margin-top:12px;">Available at: All 3 branches</div>
+          </div>
+          <div style="background:#fff; border:1.5px dashed #cfc8bc; border-radius:16px; padding:20px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; color:#8a857c; gap:8px;">
+            <div style="font-size:30px;">🎯</div>
+            <div style="font-weight:600; color:#5a554d;">Draft: Haircut + Free Beard Trim</div>
+            <div style="font-size:12.5px;">Finish setting this up to launch it.</div>
+            <button style="margin-top:6px; background:#1A1A1B; color:#fff; border:none; cursor:pointer; font-family:inherit; font-weight:600; font-size:13px; padding:9px 16px; border-radius:10px;">Continue setup</button>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ========== CUSTOMERS ========== -->
+      <sc-if value="{{ isCustomers }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="display:grid; grid-template-columns:repeat(6,1fr); gap:12px; margin-bottom:20px;">
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:14px; padding:16px;"><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:24px;">128</div><div style="font-size:12px; color:#8a857c;">New</div></div>
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:14px; padding:16px;"><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:24px;">544</div><div style="font-size:12px; color:#8a857c;">Active</div></div>
+          <div style="background:#EEE3FA; border:1.5px solid #ddc9f2; border-radius:14px; padding:16px;"><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:24px; color:#7C44BD;">96</div><div style="font-size:12px; color:#7C44BD;">Loyal</div></div>
+          <div style="background:#FEF6D6; border:1.5px solid #f0e2a8; border-radius:14px; padding:16px;"><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:24px; color:#9a7a12;">61</div><div style="font-size:12px; color:#9a7a12;">Almost 🎁</div></div>
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:14px; padding:16px;"><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:24px;">203</div><div style="font-size:12px; color:#8a857c;">Dormant</div></div>
+          <div style="background:#1A1A1B; border-radius:14px; padding:16px; color:#fff;"><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:24px;">34</div><div style="font-size:12px; opacity:0.7;">VIP ⭐</div></div>
+        </div>
+        <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:20px;">
+          <div style="display:flex; gap:12px; align-items:center; margin-bottom:16px;">
+            <input placeholder="Search by name or phone…" style="flex:1; border:1.5px solid #e6e0d6; border-radius:10px; padding:10px 14px; font-family:inherit; font-size:14px;">
+            <select style="border:1.5px solid #e6e0d6; border-radius:10px; padding:10px 12px; font-family:inherit; font-size:14px; background:#fff;"><option>All segments</option><option>Loyal</option><option>VIP</option><option>Almost</option></select>
+            <button style="background:#fff; border:1.5px solid #e6e0d6; border-radius:10px; padding:10px 16px; font-family:inherit; font-weight:600; font-size:13px; cursor:pointer;">⬇ Export CSV</button>
+          </div>
+          <div style="display:grid; grid-template-columns:1.6fr 1.2fr 0.7fr 1.4fr 1.2fr 0.9fr; font-size:11.5px; color:#a49e94; font-weight:600; padding:0 0 10px; border-bottom:1.5px solid #f0ece4;"><span>CUSTOMER</span><span>PHONE</span><span>VISITS</span><span>PROGRESS</span><span>FAV BRANCH</span><span>STATUS</span></div>
+          <sc-for list="{{ customers }}" as="c" hint-placeholder-count="6">
+            <div style="display:grid; grid-template-columns:1.6fr 1.2fr 0.7fr 1.4fr 1.2fr 0.9fr; align-items:center; font-size:13.5px; padding:13px 0; border-bottom:1px solid #f5f2ec;">
+              <span style="font-weight:600; display:flex; align-items:center; gap:9px;"><span style="width:30px; height:30px; border-radius:50%; background:{{ c.avatarBg }}; color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:600;">{{ c.initials }}</span>{{ c.name }}</span>
+              <span style="color:#6a655d;">{{ c.phone }}</span>
+              <span>{{ c.visits }}</span>
+              <span><span style="display:inline-block; width:90px; height:7px; background:#f0ece4; border-radius:99px; overflow:hidden; vertical-align:middle;"><span style="display:block; height:100%; background:#7C44BD; width:{{ c.progress }};"></span></span></span>
+              <span style="color:#6a655d;">{{ c.branch }}</span>
+              <span><span style="font-size:11px; font-weight:600; padding:3px 9px; border-radius:999px; background:{{ c.tagBg }}; color:{{ c.tagFg }};">{{ c.status }}</span></span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ========== REWARDS ========== -->
+      <sc-if value="{{ isRewards }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid; grid-template-columns:1fr 1.1fr; gap:16px; align-items:start;">
+        <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:24px;">
+          <div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:18px;">Verify a reward</div>
+          <div style="font-size:13px; color:#8a857c; margin:4px 0 16px;">Scan or type the customer's reward code.</div>
+          <div style="display:flex; gap:10px;"><input value="RW-4KX9-2P" style="flex:1; border:1.5px solid #e6e0d6; border-radius:10px; padding:12px 14px; font-family:inherit; font-size:15px; font-weight:600; letter-spacing:0.05em;"><button style="background:#7C44BD; color:#fff; border:none; cursor:pointer; font-family:inherit; font-weight:600; font-size:14px; padding:0 18px; border-radius:10px;">Look up</button></div>
+          <div style="margin-top:18px; border:1.5px solid #DFF5E9; background:#F3FBF6; border-radius:14px; padding:18px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;"><span style="font-size:11px; font-weight:600; background:#DFF5E9; color:#1c7a4d; padding:4px 10px; border-radius:999px;">✓ Valid · unclaimed</span><span style="font-size:12px; color:#8a857c;">Expires 12 Jul 2026</span></div>
+            <div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:22px; margin:14px 0 2px;">Free Cappuccino</div>
+            <div style="font-size:13.5px; color:#6a655d;">Priya Menon · +91 98••• ••432</div>
+            <div style="font-size:13.5px; color:#6a655d;">Campaign: Free Coffee After 8 Visits</div>
+            <textarea placeholder="Add a staff note (optional)…" style="width:100%; margin-top:14px; border:1.5px solid #e6e0d6; border-radius:10px; padding:10px 12px; font-family:inherit; font-size:13.5px; resize:none; height:56px;"></textarea>
+            <button style="width:100%; margin-top:12px; background:#34AD6C; color:#fff; border:none; cursor:pointer; font-family:inherit; font-weight:700; font-size:15px; padding:13px; border-radius:11px;">Mark as claimed</button>
+          </div>
+        </div>
+        <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;"><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:16px;">Redemptions</div><div style="display:flex; gap:4px; background:#F1EEE9; border-radius:999px; padding:3px;"><button style="border:none; cursor:pointer; font-family:inherit; font-size:12.5px; font-weight:600; padding:6px 12px; border-radius:999px; background:#1A1A1B; color:#fff;">Unlocked</button><button style="border:none; cursor:pointer; font-family:inherit; font-size:12.5px; font-weight:600; padding:6px 12px; border-radius:999px; background:transparent; color:#6a655d;">Claimed</button><button style="border:none; cursor:pointer; font-family:inherit; font-size:12.5px; font-weight:600; padding:6px 12px; border-radius:999px; background:transparent; color:#6a655d;">Expired</button></div></div>
+          <div style="display:grid; grid-template-columns:1.4fr 1.4fr 1fr 0.9fr; font-size:11.5px; color:#a49e94; font-weight:600; padding-bottom:10px; border-bottom:1.5px solid #f0ece4;"><span>CUSTOMER</span><span>CAMPAIGN</span><span>DATE</span><span>STATUS</span></div>
+          <div style="display:grid; grid-template-columns:1.4fr 1.4fr 1fr 0.9fr; font-size:13px; padding:12px 0; border-bottom:1px solid #f5f2ec; align-items:center;"><span style="font-weight:600;">Priya Menon</span><span style="color:#6a655d;">Free Coffee ×8</span><span style="color:#6a655d;">Today</span><span><span style="font-size:11px; font-weight:600; background:#EEE3FA; color:#7C44BD; padding:3px 8px; border-radius:999px;">Unlocked</span></span></div>
+          <div style="display:grid; grid-template-columns:1.4fr 1.4fr 1fr 0.9fr; font-size:13px; padding:12px 0; border-bottom:1px solid #f5f2ec; align-items:center;"><span style="font-weight:600;">Rahul Shetty</span><span style="color:#6a655d;">Free Pastry ×9</span><span style="color:#6a655d;">Today</span><span><span style="font-size:11px; font-weight:600; background:#EEE3FA; color:#7C44BD; padding:3px 8px; border-radius:999px;">Unlocked</span></span></div>
+          <div style="display:grid; grid-template-columns:1.4fr 1.4fr 1fr 0.9fr; font-size:13px; padding:12px 0; border-bottom:1px solid #f5f2ec; align-items:center;"><span style="font-weight:600;">Ananya Rao</span><span style="color:#6a655d;">Free Coffee ×8</span><span style="color:#6a655d;">Yesterday</span><span><span style="font-size:11px; font-weight:600; background:#EEE3FA; color:#7C44BD; padding:3px 8px; border-radius:999px;">Unlocked</span></span></div>
+          <div style="display:grid; grid-template-columns:1.4fr 1.4fr 1fr 0.9fr; font-size:13px; padding:12px 0; align-items:center;"><span style="font-weight:600;">Kabir Jain</span><span style="color:#6a655d;">Free Muffin ×6</span><span style="color:#6a655d;">2 days ago</span><span><span style="font-size:11px; font-weight:600; background:#EEE3FA; color:#7C44BD; padding:3px 8px; border-radius:999px;">Unlocked</span></span></div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ========== QR CODES ========== -->
+      <sc-if value="{{ isQr }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;"><div style="color:#7a756d; font-size:15px;">6 QR codes across 3 branches</div><button style="background:#7C44BD; color:#fff; border:none; cursor:pointer; font-family:inherit; font-weight:600; font-size:14px; padding:11px 18px; border-radius:11px;">+ Create QR</button></div>
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px;">
+          <sc-for list="{{ qrcards }}" as="q" hint-placeholder-count="5">
+            <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:18px;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start;"><div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:16px;">{{ q.label }}</div><span style="font-size:11px; font-weight:600; background:#EEE3FA; color:#7C44BD; padding:3px 9px; border-radius:999px;">{{ q.kind }}</span></div></div>
+              <div style="display:flex; justify-content:center; margin:16px 0;"><div style="width:96px; height:96px; background:#fff; border:1.5px solid #1A1A1B; border-radius:10px; position:relative;"><div style="position:absolute; top:10px; left:10px; width:24px; height:24px; border:5px solid #1A1A1B;"></div><div style="position:absolute; top:10px; right:10px; width:24px; height:24px; border:5px solid #1A1A1B;"></div><div style="position:absolute; bottom:10px; left:10px; width:24px; height:24px; border:5px solid #1A1A1B;"></div><div style="position:absolute; bottom:16px; right:16px; width:14px; height:14px; background:#1A1A1B;"></div><div style="position:absolute; bottom:34px; right:30px; width:8px; height:8px; background:#1A1A1B;"></div></div></div>
+              <div style="font-size:12px; color:#8a857c; text-align:center;">{{ q.branch }} · {{ q.scans }} scans</div>
+              <div style="display:flex; gap:6px; margin-top:14px;"><button style="flex:1; border:1.5px solid #e6e0d6; background:#fff; border-radius:9px; padding:8px; font-size:12px; font-weight:600; cursor:pointer;">PNG</button><button style="flex:1; border:1.5px solid #e6e0d6; background:#fff; border-radius:9px; padding:8px; font-size:12px; font-weight:600; cursor:pointer;">SVG</button><button style="flex:1; border:1.5px solid #e6e0d6; background:#fff; border-radius:9px; padding:8px; font-size:12px; font-weight:600; cursor:pointer;">Poster</button></div>
+            </div>
+          </sc-for>
+          <div style="background:#7C44BD; background-image:linear-gradient(#ffffff1f 1px,transparent 1px),linear-gradient(90deg,#ffffff1f 1px,transparent 1px); background-size:20px 20px; border-radius:16px; padding:22px; color:#fff; display:flex; flex-direction:column; align-items:center; text-align:center; gap:10px;">
+            <div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:15px;">Branded QR poster</div>
+            <div style="background:#fff; border-radius:14px; padding:16px 18px; color:#1A1A1B; width:100%;">
+              <div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:15px;">Brew &amp; Bean</div>
+              <div style="width:80px; height:80px; margin:12px auto; background:#fff; border:1.5px solid #1A1A1B; border-radius:8px; position:relative;"><div style="position:absolute; top:8px; left:8px; width:20px; height:20px; border:4px solid #1A1A1B;"></div><div style="position:absolute; top:8px; right:8px; width:20px; height:20px; border:4px solid #1A1A1B;"></div><div style="position:absolute; bottom:8px; left:8px; width:20px; height:20px; border:4px solid #1A1A1B;"></div></div>
+              <div style="font-size:12px; font-weight:600;">Scan to collect your stamp</div>
+            </div>
+            <div style="font-size:11.5px; opacity:0.85;">Free QR stand included on paid plans.</div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ========== BRANCHES ========== -->
+      <sc-if value="{{ isBranches }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;"><div style="color:#7a756d; font-size:15px;">3 branches</div><button style="background:#7C44BD; color:#fff; border:none; cursor:pointer; font-family:inherit; font-weight:600; font-size:14px; padding:11px 18px; border-radius:11px;">+ Add branch</button></div>
+        <div style="display:grid; grid-template-columns:1.7fr 1fr; gap:16px; align-items:start;">
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:20px;">
+            <div style="display:grid; grid-template-columns:1.4fr 1fr 0.8fr 0.9fr 0.9fr; font-size:11.5px; color:#a49e94; font-weight:600; padding-bottom:10px; border-bottom:1.5px solid #f0ece4;"><span>BRANCH</span><span>CITY</span><span>SCANS</span><span>REPEAT</span><span>REWARDS</span></div>
+            <div style="display:grid; grid-template-columns:1.4fr 1fr 0.8fr 0.9fr 0.9fr; font-size:13.5px; padding:13px 0; border-bottom:1px solid #f5f2ec; align-items:center;"><span style="font-weight:600;">MG Road</span><span style="color:#6a655d;">Bengaluru</span><span>3,204</span><span>64%</span><span>287</span></div>
+            <div style="display:grid; grid-template-columns:1.4fr 1fr 0.8fr 0.9fr 0.9fr; font-size:13.5px; padding:13px 0; border-bottom:1px solid #f5f2ec; align-items:center;"><span style="font-weight:600;">Indiranagar</span><span style="color:#6a655d;">Bengaluru</span><span>2,110</span><span>58%</span><span>164</span></div>
+            <div style="display:grid; grid-template-columns:1.4fr 1fr 0.8fr 0.9fr 0.9fr; font-size:13.5px; padding:13px 0; align-items:center;"><span style="font-weight:600;">Koramangala</span><span style="color:#6a655d;">Bengaluru</span><span>1,488</span><span>52%</span><span>98</span></div>
+          </div>
+          <div style="background:#1A1A1B; color:#fff; border-radius:16px; padding:20px;">
+            <div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:16px; margin-bottom:14px;">Leaderboard · 30 days</div>
+            <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #2e2e30;"><span style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:18px; color:#D5F170;">1</span><span style="flex:1; font-weight:600;">MG Road</span><span style="color:#b6b0a6;">3,204</span></div>
+            <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #2e2e30;"><span style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:18px; color:#9a948a;">2</span><span style="flex:1; font-weight:600;">Indiranagar</span><span style="color:#b6b0a6;">2,110</span></div>
+            <div style="display:flex; align-items:center; gap:12px; padding:10px 0;"><span style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:18px; color:#9a948a;">3</span><span style="flex:1; font-weight:600;">Koramangala</span><span style="color:#b6b0a6;">1,488</span></div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ========== STAFF ========== -->
+      <sc-if value="{{ isStaff }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;"><div style="color:#7a756d; font-size:15px;">5 team members</div><button style="background:#7C44BD; color:#fff; border:none; cursor:pointer; font-family:inherit; font-weight:600; font-size:14px; padding:11px 18px; border-radius:11px;">+ Invite staff</button></div>
+        <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:20px;">
+          <div style="display:grid; grid-template-columns:1.6fr 1.6fr 1fr 1fr 0.9fr; font-size:11.5px; color:#a49e94; font-weight:600; padding-bottom:10px; border-bottom:1.5px solid #f0ece4;"><span>NAME</span><span>EMAIL</span><span>ROLE</span><span>BRANCH</span><span>STATUS</span></div>
+          <div style="display:grid; grid-template-columns:1.6fr 1.6fr 1fr 1fr 0.9fr; font-size:13.5px; padding:13px 0; border-bottom:1px solid #f5f2ec; align-items:center;"><span style="font-weight:600;">Aarav Kapoor</span><span style="color:#6a655d;">aarav@brewbean.in</span><span>Owner</span><span style="color:#6a655d;">All</span><span><span style="font-size:11px; font-weight:600; background:#DFF5E9; color:#1c7a4d; padding:3px 8px; border-radius:999px;">Active</span></span></div>
+          <div style="display:grid; grid-template-columns:1.6fr 1.6fr 1fr 1fr 0.9fr; font-size:13.5px; padding:13px 0; border-bottom:1px solid #f5f2ec; align-items:center;"><span style="font-weight:600;">Meera Nair</span><span style="color:#6a655d;">meera@brewbean.in</span><span>Branch Mgr</span><span style="color:#6a655d;">MG Road</span><span><span style="font-size:11px; font-weight:600; background:#DFF5E9; color:#1c7a4d; padding:3px 8px; border-radius:999px;">Active</span></span></div>
+          <div style="display:grid; grid-template-columns:1.6fr 1.6fr 1fr 1fr 0.9fr; font-size:13.5px; padding:13px 0; border-bottom:1px solid #f5f2ec; align-items:center;"><span style="font-weight:600;">Tanvi Bose</span><span style="color:#6a655d;">tanvi@brewbean.in</span><span>Staff</span><span style="color:#6a655d;">Indiranagar</span><span><span style="font-size:11px; font-weight:600; background:#DFF5E9; color:#1c7a4d; padding:3px 8px; border-radius:999px;">Active</span></span></div>
+          <div style="display:grid; grid-template-columns:1.6fr 1.6fr 1fr 1fr 0.9fr; font-size:13.5px; padding:13px 0; align-items:center;"><span style="font-weight:600;">Rohan Das</span><span style="color:#6a655d;">rohan@brewbean.in</span><span>Staff</span><span style="color:#6a655d;">Koramangala</span><span><span style="font-size:11px; font-weight:600; background:#F1EEE9; color:#7a756d; padding:3px 8px; border-radius:999px;">Disabled</span></span></div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ========== ANALYTICS ========== -->
+      <sc-if value="{{ isAnalytics }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;"><div style="color:#7a756d; font-size:15px;">Deeper performance insights</div><select style="border:1.5px solid #e6e0d6; border-radius:10px; padding:9px 12px; font-family:inherit; font-size:13.5px; background:#fff;"><option>Last 30 days</option><option>Last 7 days</option><option>Last 90 days</option></select></div>
+        <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:20px; margin-bottom:16px;">
+          <div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:16px; margin-bottom:6px;">Redemption funnel</div>
+          <div style="display:flex; flex-direction:column; gap:8px; margin-top:12px;">
+            <div style="display:flex; align-items:center; gap:12px;"><span style="width:120px; font-size:13px;">Enrolled</span><span style="flex:1; height:26px; background:#7C44BD; border-radius:7px; width:100%;"></span><span style="width:50px; font-weight:600; font-size:13px;">892</span></div>
+            <div style="display:flex; align-items:center; gap:12px;"><span style="width:120px; font-size:13px;">Stamping</span><span style="height:26px; background:#9563cc; border-radius:7px; width:78%;"></span><span style="width:50px; font-weight:600; font-size:13px;">696</span></div>
+            <div style="display:flex; align-items:center; gap:12px;"><span style="width:120px; font-size:13px;">Near reward</span><span style="height:26px; background:#F06706; border-radius:7px; width:41%;"></span><span style="width:50px; font-weight:600; font-size:13px;">366</span></div>
+            <div style="display:flex; align-items:center; gap:12px;"><span style="width:120px; font-size:13px;">Unlocked</span><span style="height:26px; background:#F0D80B; border-radius:7px; width:33%;"></span><span style="width:50px; font-weight:600; font-size:13px;">294</span></div>
+            <div style="display:flex; align-items:center; gap:12px;"><span style="width:120px; font-size:13px;">Claimed</span><span style="height:26px; background:#34AD6C; border-radius:7px; width:24%;"></span><span style="width:50px; font-weight:600; font-size:13px;">218</span></div>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:20px;">
+            <div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:16px; margin-bottom:14px;">Branch comparison</div>
+            <div style="display:flex; align-items:flex-end; gap:20px; height:120px; padding:0 10px;"><div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;"><div style="width:100%; background:#7C44BD; border-radius:6px 6px 0 0; height:100px;"></div><span style="font-size:11px; color:#8a857c;">MG Road</span></div><div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;"><div style="width:100%; background:#9563cc; border-radius:6px 6px 0 0; height:66px;"></div><span style="font-size:11px; color:#8a857c;">Indira.</span></div><div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;"><div style="width:100%; background:#b48fdb; border-radius:6px 6px 0 0; height:46px;"></div><span style="font-size:11px; color:#8a857c;">Korama.</span></div></div>
+          </div>
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:20px;">
+            <div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:16px; margin-bottom:14px;">Campaign ROI</div>
+            <div style="display:grid; grid-template-columns:2fr 1fr 1fr; font-size:11.5px; color:#a49e94; font-weight:600; padding-bottom:8px; border-bottom:1.5px solid #f0ece4;"><span>CAMPAIGN</span><span>COST</span><span>RETURN</span></div>
+            <div style="display:grid; grid-template-columns:2fr 1fr 1fr; font-size:13px; padding:10px 0; border-bottom:1px solid #f5f2ec;"><span style="font-weight:600;">Free Coffee ×8</span><span>₹28k</span><span style="color:#34AD6C; font-weight:600;">4.1×</span></div>
+            <div style="display:grid; grid-template-columns:2fr 1fr 1fr; font-size:13px; padding:10px 0; border-bottom:1px solid #f5f2ec;"><span style="font-weight:600;">Free Pastry ×9</span><span>₹14k</span><span style="color:#34AD6C; font-weight:600;">3.2×</span></div>
+            <div style="display:grid; grid-template-columns:2fr 1fr 1fr; font-size:13px; padding:10px 0;"><span style="font-weight:600;">Double Stamp</span><span>₹9k</span><span style="color:#34AD6C; font-weight:600;">2.4×</span></div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ========== MESSAGES ========== -->
+      <sc-if value="{{ isMessages }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid; grid-template-columns:1fr 1.2fr; gap:16px; align-items:start;">
+        <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:20px;">
+          <div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:16px; margin-bottom:14px;">Templates</div>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <div style="border:1.5px solid #7C44BD; background:#F9F5FF; border-radius:12px; padding:14px;"><div style="display:flex; justify-content:space-between;"><span style="font-weight:600; font-size:14px;">1 stamp away</span><span style="font-size:11px; font-weight:600; background:#DCF3E7; color:#1c7a4d; padding:2px 8px; border-radius:999px;">WhatsApp</span></div><div style="font-size:12.5px; color:#8a857c; margin-top:4px;">Nudge customers close to a reward.</div></div>
+            <div style="border:1.5px solid #ebe5db; border-radius:12px; padding:14px;"><div style="display:flex; justify-content:space-between;"><span style="font-weight:600; font-size:14px;">Reward expiry reminder</span><span style="font-size:11px; font-weight:600; background:#EEE3FA; color:#7C44BD; padding:2px 8px; border-radius:999px;">SMS</span></div><div style="font-size:12.5px; color:#8a857c; margin-top:4px;">"Your free coffee expires soon."</div></div>
+            <div style="border:1.5px solid #ebe5db; border-radius:12px; padding:14px;"><div style="display:flex; justify-content:space-between;"><span style="font-weight:600; font-size:14px;">Inactive comeback</span><span style="font-size:11px; font-weight:600; background:#FDECEC; color:#d0362c; padding:2px 8px; border-radius:999px;">Email</span></div><div style="font-size:12.5px; color:#8a857c; margin-top:4px;">Win back dormant customers.</div></div>
+            <div style="border:1.5px solid #ebe5db; border-radius:12px; padding:14px;"><div style="display:flex; justify-content:space-between;"><span style="font-weight:600; font-size:14px;">Review request</span><span style="font-size:11px; font-weight:600; background:#FEF6D6; color:#9a7a12; padding:2px 8px; border-radius:999px;">Push</span></div><div style="font-size:12.5px; color:#8a857c; margin-top:4px;">Ask for a review after a reward.</div></div>
+          </div>
+        </div>
+        <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:20px;">
+          <div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:16px; margin-bottom:6px;">Edit: "1 stamp away"</div>
+          <div style="display:flex; gap:6px; margin:10px 0;"><span style="font-size:11px; background:#F1EEE9; padding:4px 9px; border-radius:999px; cursor:pointer;">{name}</span><span style="font-size:11px; background:#F1EEE9; padding:4px 9px; border-radius:999px; cursor:pointer;">{stamps_left}</span><span style="font-size:11px; background:#F1EEE9; padding:4px 9px; border-radius:999px; cursor:pointer;">{reward}</span></div>
+          <textarea style="width:100%; border:1.5px solid #e6e0d6; border-radius:12px; padding:14px; font-family:inherit; font-size:14px; height:120px; resize:none; line-height:1.5;">Hi {name} 👋 You're just {stamps_left} stamp away from your {reward} at Brew & Bean. Pop in this week and it's yours! ☕</textarea>
+          <div style="font-size:11.5px; color:#a49e94; margin-top:8px;">Only sent to customers who opted in. Includes an opt-out link automatically.</div>
+          <div style="display:flex; gap:10px; margin-top:14px;"><button style="flex:1; background:#34AD6C; color:#fff; border:none; cursor:pointer; font-family:inherit; font-weight:600; font-size:14px; padding:12px; border-radius:11px;">Send now</button><button style="flex:1; background:#fff; border:1.5px solid #e6e0d6; cursor:pointer; font-family:inherit; font-weight:600; font-size:14px; padding:12px; border-radius:11px;">Schedule</button></div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ========== REVIEWS & SOCIAL ========== -->
+      <sc-if value="{{ isReviews }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:16px;">
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:14px; padding:16px;"><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:24px;">1,204</div><div style="font-size:12px; color:#8a857c;">Review clicks</div></div>
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:14px; padding:16px;"><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:24px;">386</div><div style="font-size:12px; color:#8a857c;">Reviews submitted</div></div>
+          <div style="background:#DFF5E9; border:1.5px solid #b9e3cd; border-radius:14px; padding:16px;"><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:24px; color:#1c7a4d;">32%</div><div style="font-size:12px; color:#1c7a4d;">Conversion</div></div>
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:14px; padding:16px;"><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:24px;">742</div><div style="font-size:12px; color:#8a857c;">Social clicks</div></div>
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:14px; padding:16px;"><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:24px;">58</div><div style="font-size:12px; color:#8a857c;">Referrals</div></div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start;">
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:20px;">
+            <div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:16px; margin-bottom:14px;">Configuration</div>
+            <label style="font-size:12.5px; font-weight:600; color:#6a655d;">Google review link</label>
+            <input value="g.page/r/brewbean/review" style="width:100%; margin:6px 0 14px; border:1.5px solid #e6e0d6; border-radius:10px; padding:10px 12px; font-family:inherit; font-size:13.5px;">
+            <label style="font-size:12.5px; font-weight:600; color:#6a655d;">Social handles</label>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:6px;"><input value="@brewbean.in — Instagram" style="border:1.5px solid #e6e0d6; border-radius:10px; padding:9px 12px; font-family:inherit; font-size:13px;"><input value="/brewbeancafe — Facebook" style="border:1.5px solid #e6e0d6; border-radius:10px; padding:9px 12px; font-family:inherit; font-size:13px;"></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; padding-top:14px; border-top:1.5px solid #f0ece4;"><span style="font-size:13.5px; font-weight:600;">Prompt review after reward</span><span style="width:44px; height:26px; background:#34AD6C; border-radius:999px; position:relative;"><span style="position:absolute; top:3px; right:3px; width:20px; height:20px; background:#fff; border-radius:50%;"></span></span></div>
+          </div>
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:20px;">
+            <div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:16px; margin-bottom:14px;">Review funnel</div>
+            <div style="display:flex; flex-direction:column; gap:10px;"><div style="display:flex; align-items:center; gap:12px;"><span style="width:90px; font-size:13px;">Prompted</span><span style="height:24px; background:#7C44BD; border-radius:7px; width:100%;"></span><span style="font-size:13px; font-weight:600;">1,204</span></div><div style="display:flex; align-items:center; gap:12px;"><span style="width:90px; font-size:13px;">Clicked</span><span style="height:24px; background:#9563cc; border-radius:7px; width:62%;"></span><span style="font-size:13px; font-weight:600;">742</span></div><div style="display:flex; align-items:center; gap:12px;"><span style="width:90px; font-size:13px;">Submitted</span><span style="height:24px; background:#34AD6C; border-radius:7px; width:32%;"></span><span style="font-size:13px; font-weight:600;">386</span></div></div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ========== ACCOUNT & PLAN ========== -->
+      <sc-if value="{{ isAccount }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:16px;">
+          <div style="background:#1A1A1B; color:#fff; border-radius:16px; padding:24px;">
+            <span style="font-size:11px; font-weight:600; background:#FDF3D9; color:#9a7a12; padding:4px 10px; border-radius:999px;">● Free trial</span>
+            <div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:28px; margin:14px 0 2px;">Pro plan</div>
+            <div style="color:#b6b0a6; font-size:14px;">21 days left in your free trial</div>
+            <div style="margin-top:18px; height:8px; background:#2e2e30; border-radius:99px; overflow:hidden;"><div style="height:100%; width:30%; background:#D5F170;"></div></div>
+            <button style="width:100%; margin-top:20px; background:#34AD6C; color:#fff; border:none; cursor:pointer; font-family:inherit; font-weight:700; font-size:15px; padding:14px; border-radius:12px;">💬 Contact us to upgrade / renew</button>
+          </div>
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:24px;">
+            <div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:18px; margin-bottom:16px;">How billing works</div>
+            <div style="display:flex; gap:12px; margin-bottom:14px;"><span style="width:26px; height:26px; flex-shrink:0; border-radius:50%; background:#EEE3FA; color:#7C44BD; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px;">1</span><div style="font-size:13.5px; color:#5a554d;"><b>30-day free trial.</b> Explore every feature, no card required.</div></div>
+            <div style="display:flex; gap:12px; margin-bottom:14px;"><span style="width:26px; height:26px; flex-shrink:0; border-radius:50%; background:#EEE3FA; color:#7C44BD; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px;">2</span><div style="font-size:13.5px; color:#5a554d;"><b>Pay annual fee via UPI</b> to the Rewrd team when you're ready.</div></div>
+            <div style="display:flex; gap:12px;"><span style="width:26px; height:26px; flex-shrink:0; border-radius:50%; background:#EEE3FA; color:#7C44BD; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px;">3</span><div style="font-size:13.5px; color:#5a554d;"><b>We activate instantly.</b> Access renews the moment payment lands.</div></div>
+          </div>
+        </div>
+        <div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:16px; margin:24px 0 12px;">Available plans</div>
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:14px;">
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:14px; padding:18px;"><div style="font-weight:700; font-family:'Familjen Grotesk',sans-serif;">Basic</div><div style="font-size:12px; color:#8a857c;">1 location</div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:22px; margin-top:8px;">₹999<span style="font-size:12px; color:#8a857c;">/yr</span></div></div>
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:14px; padding:18px;"><div style="font-weight:700; font-family:'Familjen Grotesk',sans-serif;">Growth</div><div style="font-size:12px; color:#8a857c;">Up to 3</div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:22px; margin-top:8px;">₹2,499<span style="font-size:12px; color:#8a857c;">/yr</span></div></div>
+          <div style="background:#F9F5FF; border:2px solid #7C44BD; border-radius:14px; padding:18px; position:relative;"><span style="position:absolute; top:-11px; left:14px; font-size:10.5px; font-weight:700; background:#7C44BD; color:#fff; padding:3px 9px; border-radius:999px;">CURRENT</span><div style="font-weight:700; font-family:'Familjen Grotesk',sans-serif;">Pro</div><div style="font-size:12px; color:#8a857c;">Up to 6</div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:22px; margin-top:8px;">₹4,999<span style="font-size:12px; color:#8a857c;">/yr</span></div></div>
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:14px; padding:18px;"><div style="font-weight:700; font-family:'Familjen Grotesk',sans-serif;">Enterprise</div><div style="font-size:12px; color:#8a857c;">Unlimited</div><div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:22px; margin-top:8px;">Custom</div></div>
+        </div>
+        <div style="margin-top:20px;"><button onClick="{{ showPaused }}" style="background:#fff; border:1.5px solid #e6e0d6; cursor:pointer; font-family:inherit; font-weight:600; font-size:13px; color:#8a857c; padding:9px 16px; border-radius:10px;">⚠ Preview locked / paused state →</button></div>
+      </div>
+      </sc-if>
+
+      <!-- ========== FRAUD & AUDIT ========== -->
+      <sc-if value="{{ isFraud }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:20px; margin-bottom:16px;">
+          <div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:16px; margin-bottom:14px;">Fraud alerts</div>
+          <div style="display:grid; grid-template-columns:1.2fr 0.8fr 1.6fr 0.9fr 1fr; font-size:11.5px; color:#a49e94; font-weight:600; padding-bottom:10px; border-bottom:1.5px solid #f0ece4;"><span>TYPE</span><span>SEVERITY</span><span>CONTEXT</span><span>STATUS</span><span>ACTION</span></div>
+          <div style="display:grid; grid-template-columns:1.2fr 0.8fr 1.6fr 0.9fr 1fr; font-size:13px; padding:13px 0; border-bottom:1px solid #f5f2ec; align-items:center;"><span style="font-weight:600;">Velocity</span><span><span style="font-size:11px; font-weight:600; background:#FDECEC; color:#d0362c; padding:3px 8px; border-radius:999px;">High</span></span><span style="color:#6a655d;">14 scans in 3 min · Koramangala</span><span><span style="font-size:11px; font-weight:600; background:#FEF6D6; color:#9a7a12; padding:3px 8px; border-radius:999px;">Open</span></span><span><button style="border:1.5px solid #e6e0d6; background:#fff; border-radius:8px; padding:5px 10px; font-size:12px; font-weight:600; cursor:pointer;">Review</button></span></div>
+          <div style="display:grid; grid-template-columns:1.2fr 0.8fr 1.6fr 0.9fr 1fr; font-size:13px; padding:13px 0; border-bottom:1px solid #f5f2ec; align-items:center;"><span style="font-weight:600;">Shared device</span><span><span style="font-size:11px; font-weight:600; background:#FEF6D6; color:#9a7a12; padding:3px 8px; border-radius:999px;">Med</span></span><span style="color:#6a655d;">6 accounts, 1 device</span><span><span style="font-size:11px; font-weight:600; background:#FEF6D6; color:#9a7a12; padding:3px 8px; border-radius:999px;">Open</span></span><span><button style="border:1.5px solid #e6e0d6; background:#fff; border-radius:8px; padding:5px 10px; font-size:12px; font-weight:600; cursor:pointer;">Review</button></span></div>
+          <div style="display:grid; grid-template-columns:1.2fr 0.8fr 1.6fr 0.9fr 1fr; font-size:13px; padding:13px 0; align-items:center;"><span style="font-weight:600;">Geo mismatch</span><span><span style="font-size:11px; font-weight:600; background:#F1EEE9; color:#7a756d; padding:3px 8px; border-radius:999px;">Low</span></span><span style="color:#6a655d;">Scan 8km from branch</span><span><span style="font-size:11px; font-weight:600; background:#DFF5E9; color:#1c7a4d; padding:3px 8px; border-radius:999px;">Dismissed</span></span><span style="color:#a49e94; font-size:12px;">Closed</span></div>
+        </div>
+        <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:20px;">
+          <div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:16px; margin-bottom:6px;">Audit log</div>
+          <div style="font-size:12px; color:#a49e94; margin-bottom:12px;">Immutable · read-only</div>
+          <div style="display:flex; flex-direction:column; gap:0; font-size:13px;">
+            <div style="display:flex; gap:12px; padding:10px 0; border-bottom:1px solid #f5f2ec;"><span style="color:#a49e94; width:120px; flex-shrink:0;">Today 10:24</span><span><b>Aarav K.</b> paused campaign "Weekend Double Stamp"</span></div>
+            <div style="display:flex; gap:12px; padding:10px 0; border-bottom:1px solid #f5f2ec;"><span style="color:#a49e94; width:120px; flex-shrink:0;">Today 09:02</span><span><b>Meera N.</b> claimed reward RW-4KX9-2P</span></div>
+            <div style="display:flex; gap:12px; padding:10px 0;"><span style="color:#a49e94; width:120px; flex-shrink:0;">Yest. 18:40</span><span><b>Aarav K.</b> invited staff "Rohan Das"</span></div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ========== SETTINGS ========== -->
+      <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:720px;">
+        <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:24px; margin-bottom:16px;">
+          <div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:16px; margin-bottom:16px;">Business profile</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+            <div><label style="font-size:12.5px; font-weight:600; color:#6a655d;">Business name</label><input value="Brew & Bean" style="width:100%; margin-top:5px; border:1.5px solid #e6e0d6; border-radius:10px; padding:10px 12px; font-family:inherit; font-size:14px;"></div>
+            <div><label style="font-size:12.5px; font-weight:600; color:#6a655d;">Business type</label><select style="width:100%; margin-top:5px; border:1.5px solid #e6e0d6; border-radius:10px; padding:10px 12px; font-family:inherit; font-size:14px; background:#fff;"><option>Café</option><option>Restaurant</option><option>Bakery</option></select></div>
+            <div><label style="font-size:12.5px; font-weight:600; color:#6a655d;">Brand color</label><div style="display:flex; gap:8px; margin-top:5px;"><span style="width:36px; height:36px; border-radius:9px; background:#F06706; border:2px solid #1A1A1B;"></span><span style="width:36px; height:36px; border-radius:9px; background:#7C44BD;"></span><span style="width:36px; height:36px; border-radius:9px; background:#34AD6C;"></span></div></div>
+            <div><label style="font-size:12.5px; font-weight:600; color:#6a655d;">Logo</label><div style="margin-top:5px; border:1.5px dashed #cfc8bc; border-radius:10px; padding:12px; text-align:center; font-size:12.5px; color:#a49e94;">⬆ Upload logo</div></div>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:20px;"><div style="font-weight:600; font-size:14px;">GST number</div><input value="29ABCDE1234F1Z5" style="width:100%; margin-top:8px; border:1.5px solid #e6e0d6; border-radius:10px; padding:9px 12px; font-family:inherit; font-size:13.5px;"></div>
+          <div style="background:#fff; border:1.5px solid #ebe5db; border-radius:16px; padding:20px;"><div style="font-weight:600; font-size:14px;">KYC status</div><div style="margin-top:10px;"><span style="font-size:12px; font-weight:600; background:#DFF5E9; color:#1c7a4d; padding:5px 12px; border-radius:999px;">✓ Verified</span></div></div>
+        </div>
+        <div style="background:#FDECEC; border:1.5px solid #f5c9c9; border-radius:16px; padding:20px;">
+          <div style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:15px; color:#b0392f;">Danger zone</div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;"><span style="font-size:13.5px; color:#8a4a44;">Export all data or request account deletion.</span><div style="display:flex; gap:8px;"><button style="border:1.5px solid #e0aca8; background:#fff; color:#b0392f; border-radius:9px; padding:8px 14px; font-size:13px; font-weight:600; cursor:pointer;">Export data</button><button style="border:none; background:#d0362c; color:#fff; border-radius:9px; padding:8px 14px; font-size:13px; font-weight:600; cursor:pointer;">Delete account</button></div></div>
+        </div>
+      </div>
+      </sc-if>
+
+    </main>
+  </div>
+</div>
+</sc-if>
+
+<!-- ========== PAUSED / LOCKED STATE (full screen) ========== -->
+<sc-if value="{{ isPaused }}" hint-placeholder-val="{{ false }}">
+<div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; background:#F5F1EA;">
+  <div style="max-width:460px; text-align:center; background:#fff; border:2px solid #1A1A1B; border-radius:28px; box-shadow:6px 6px 0 #1A1A1B; padding:44px 36px;">
+    <div style="width:72px; height:72px; margin:0 auto 20px; border-radius:20px; background:#FEF6D6; border:2px solid #1A1A1B; display:flex; align-items:center; justify-content:center; font-size:34px;">⏸️</div>
+    <h1 style="font-family:'Familjen Grotesk',sans-serif; font-weight:700; font-size:30px; margin:0;">Account paused</h1>
+    <p style="font-size:15px; color:#6a655d; line-height:1.55; margin:14px 0 26px;">Your Rewrd access is currently paused. This usually happens when an annual renewal is pending. Your data is safe — reach out and we'll reactivate you instantly once payment is confirmed.</p>
+    <button style="width:100%; background:#34AD6C; color:#fff; border:none; cursor:pointer; font-family:inherit; font-weight:700; font-size:15px; padding:14px; border-radius:12px;">💬 Contact Rewrd on WhatsApp</button>
+    <div style="display:flex; gap:10px; margin-top:10px;">
+      <button onClick="{{ hidePaused }}" style="flex:1; background:#fff; border:1.5px solid #e6e0d6; cursor:pointer; font-family:inherit; font-weight:600; font-size:14px; padding:12px; border-radius:12px;">← Back to demo</button>
+      <button style="flex:1; background:#fff; border:1.5px solid #e6e0d6; cursor:pointer; font-family:inherit; font-weight:600; font-size:14px; padding:12px; border-radius:12px;">Log out</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:860}}">
+class Component extends DCLogic {
+  state = { view: 'overview' };
+
+  go(id) { this.setState({ view: id }); }
+
+  buildNav(items) {
+    return items.map(it => {
+      const active = this.state.view === it.id;
+      return {
+        id: it.id, label: it.label, icon: it.icon,
+        active,
+        bg: active ? '#1A1A1B' : 'transparent',
+        fg: active ? '#ffffff' : '#4a453d',
+        weight: active ? '600' : '500',
+        onClick: () => this.go(it.id)
+      };
+    });
+  }
+
+  renderVals() {
+    const v = this.state.view;
+    const titles = {
+      overview:'Overview', campaigns:'Campaigns', customers:'Customers', rewards:'Rewards',
+      qr:'QR Codes', branches:'Branches', staff:'Staff', analytics:'Analytics',
+      messages:'Messages', reviews:'Reviews & Social', account:'Account & Plan',
+      fraud:'Fraud & Audit', settings:'Settings'
+    };
+    const customers = [
+      { name:'Priya Menon', initials:'PM', avatarBg:'#7C44BD', phone:'+91 98••• ••432', visits:12, progress:'88%', branch:'MG Road', status:'Loyal', tagBg:'#EEE3FA', tagFg:'#7C44BD' },
+      { name:'Rahul Shetty', initials:'RS', avatarBg:'#F06706', phone:'+91 99••• ••118', visits:8, progress:'62%', branch:'Indiranagar', status:'Active', tagBg:'#F1EEE9', tagFg:'#7a756d' },
+      { name:'Ananya Rao', initials:'AR', avatarBg:'#34AD6C', phone:'+91 97••• ••905', visits:22, progress:'95%', branch:'MG Road', status:'VIP', tagBg:'#1A1A1B', tagFg:'#ffffff' },
+      { name:'Kabir Jain', initials:'KJ', avatarBg:'#F74445', phone:'+91 90••• ••277', visits:5, progress:'40%', branch:'Koramangala', status:'Almost', tagBg:'#FEF6D6', tagFg:'#9a7a12' },
+      { name:'Sara Ali', initials:'SA', avatarBg:'#ED3B9B', phone:'+91 98••• ••640', visits:2, progress:'18%', branch:'Indiranagar', status:'New', tagBg:'#DFF5E9', tagFg:'#1c7a4d' },
+      { name:'Dev Patel', initials:'DP', avatarBg:'#F0D80B', phone:'+91 96••• ••512', visits:1, progress:'6%', branch:'MG Road', status:'Dormant', tagBg:'#F1EEE9', tagFg:'#7a756d' }
+    ];
+    const qrcards = [
+      { label:'Front Counter', kind:'Counter', branch:'MG Road', scans:1820 },
+      { label:'Table Tents', kind:'Table', branch:'MG Road', scans:640 },
+      { label:'Bill QR', kind:'Bill', branch:'Indiranagar', scans:988 },
+      { label:'Store Entrance', kind:'Store', branch:'Koramangala', scans:412 },
+      { label:'Shared All-Branch', kind:'Shared', branch:'All', scans:3204 }
+    ];
+    return {
+      title: titles[v] || 'Overview',
+      navMain: this.buildNav([
+        {id:'overview',label:'Overview',icon:'▚'},
+        {id:'campaigns',label:'Campaigns',icon:'◎'},
+        {id:'customers',label:'Customers',icon:'☺'},
+        {id:'rewards',label:'Rewards',icon:'🎁'},
+        {id:'qr',label:'QR Codes',icon:'▦'},
+        {id:'branches',label:'Branches',icon:'⌂'},
+        {id:'staff',label:'Staff',icon:'♟'}
+      ]),
+      navInsights: this.buildNav([
+        {id:'analytics',label:'Analytics',icon:'📈'},
+        {id:'messages',label:'Messages',icon:'✉'},
+        {id:'reviews',label:'Reviews & Social',icon:'★'}
+      ]),
+      navAccount: this.buildNav([
+        {id:'account',label:'Account & Plan',icon:'◈'},
+        {id:'fraud',label:'Fraud & Audit',icon:'⚠'},
+        {id:'settings',label:'Settings',icon:'⚙'}
+      ]),
+      isOverview:v==='overview', isCampaigns:v==='campaigns', isCustomers:v==='customers',
+      isRewards:v==='rewards', isQr:v==='qr', isBranches:v==='branches', isStaff:v==='staff',
+      isAnalytics:v==='analytics', isMessages:v==='messages', isReviews:v==='reviews',
+      isAccount:v==='account', isFraud:v==='fraud', isSettings:v==='settings',
+      isPaused: v==='paused', notPaused: v!=='paused',
+      customers, qrcards,
+      showPaused: () => this.go('paused'),
+      hidePaused: () => this.go('account')
+    };
+  }
+}
+</script>
+</body>
+</html>
