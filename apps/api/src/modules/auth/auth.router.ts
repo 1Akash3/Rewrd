@@ -134,8 +134,11 @@ authRouter.post(
       subject: `Your Rewrd code is ${code}`,
       html: `<div style="font-family:system-ui;padding:24px"><h2>Your verification code</h2><p style="font-size:32px;font-weight:700;letter-spacing:4px">${code}</p><p style="color:#666">This code expires in ${Math.round(env.otpTtlSeconds / 60)} minutes.</p></div>`,
     });
-    // eslint-disable-next-line no-console
-    console.log(`[otp:email] ${email} -> ${code}`);
+    // Only log the raw code in dev — never print real OTP codes to production logs.
+    if (env.otpDevEcho) {
+      // eslint-disable-next-line no-console
+      console.log(`[otp:email] ${email} -> ${code}`);
+    }
     ok(res, { sent: true, ...(env.otpDevEcho ? { devCode: code } : {}) });
   }),
 );

@@ -8,8 +8,8 @@ import { GoogleSignIn } from '@/components/GoogleSignIn';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('owner@brewbean.dev');
-  const [password, setPassword] = useState('owner1234');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -39,7 +39,6 @@ export default function LoginPage() {
       </form>
       <GoogleSignIn label="signin_with" />
       <p className="mt-4 text-center text-sm text-muted">New here? <Link href="/signup" className="font-semibold text-brand">Start a free trial</Link></p>
-      <p className="mt-2 rounded-md bg-canvas p-2 text-center text-xs text-muted">Demo: owner@brewbean.dev / owner1234</p>
     </div>
   );
 }
