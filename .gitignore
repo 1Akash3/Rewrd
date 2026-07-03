@@ -1,3 +1,6 @@
+# Claude Code local config (dev-tooling only, not part of the app)
+.claude/
+
 # Dependencies
 node_modules/
 .pnp
