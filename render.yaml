@@ -1,0 +1,50 @@
+# Render Blueprint for the Rewrd API. Connect this repo in the Render
+# dashboard as a "Blueprint" and it reads this file automatically.
+# Docs: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: rewrd-api
+    runtime: node
+    region: singapore # closest to India; change if you deploy elsewhere
+    plan: free
+    rootDir: apps/api
+    buildCommand: cd ../.. && npm ci && npm run build -w @loyalty/api
+    startCommand: npm run start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+      # Everything below is set to `sync: false` — Render will prompt you to
+      # fill these in the dashboard instead of storing secrets in the repo.
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: API_BASE_URL
+        value: https://api.rewrd.online
+      - key: CORS_ORIGINS
+        value: https://rewrd.online,https://www.rewrd.online
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        value: Rewrd <hello@rewrd.online>
+      - key: OTP_DEV_ECHO
+        value: "false"
+      - key: VAPID_PUBLIC_KEY
+        sync: false
+      - key: VAPID_PRIVATE_KEY
+        sync: false
+      - key: VAPID_SUBJECT
+        value: mailto:hello@rewrd.online
+      - key: GOOGLE_MAPS_API_KEY
+        sync: false
+      - key: SENTRY_DSN
+        sync: false
