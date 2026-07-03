@@ -21,13 +21,25 @@ export function Card({ children, className = '' }: { children: ReactNode; classN
   return <div className={`card ${className}`}>{children}</div>;
 }
 
-// Rewrd wordmark: red rounded-square "✦" mark + "rewrd" in the display face.
+// The Rewrd sparkle glyph, hand-vectorized (not a Unicode character — those
+// render inconsistently across OS/font stacks). Mirrors public/icon.svg so
+// the in-app mark and the browser favicon/PWA icon are pixel-consistent.
+export function SparkleGlyph({ size = 18, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
+      <path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z" />
+    </svg>
+  );
+}
+
+// Rewrd wordmark: red rounded-square sparkle mark + "rewrd" in the display face.
 export function Logo({ size = 'md', className = '', mark = true }: { size?: 'sm' | 'md' | 'lg'; className?: string; mark?: boolean }) {
-  const box = size === 'lg' ? 'h-9 w-9 text-lg rounded-[11px]' : size === 'sm' ? 'h-[30px] w-[30px] text-[15px] rounded-lg' : 'h-[34px] w-[34px] text-lg rounded-[10px]';
+  const box = size === 'lg' ? 'h-9 w-9 rounded-[11px]' : size === 'sm' ? 'h-[30px] w-[30px] rounded-lg' : 'h-[34px] w-[34px] rounded-[10px]';
+  const glyph = size === 'lg' ? 20 : size === 'sm' ? 16 : 18;
   const word = size === 'lg' ? 'text-[26px]' : size === 'sm' ? 'text-xl' : 'text-2xl';
   return (
     <span className={`flex items-center gap-2.5 ${className}`}>
-      {mark && <span className={`grid place-items-center bg-red font-bold text-white shadow-hard-sm ${box}`}>✦</span>}
+      {mark && <span className={`grid place-items-center bg-red text-white shadow-hard-sm ${box}`}><SparkleGlyph size={glyph} /></span>}
       <span className={`font-head font-bold tracking-[-0.03em] text-ink ${word}`}>rewrd</span>
     </span>
   );

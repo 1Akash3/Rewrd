@@ -4,8 +4,8 @@
   "description": "Collect stamps and unlock rewards from your favourite local businesses.",
   "start_url": "/app",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#4f46e5",
+  "background_color": "#FFF9F4",
+  "theme_color": "#7C44BD",
   "icons": [
     { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
   ]

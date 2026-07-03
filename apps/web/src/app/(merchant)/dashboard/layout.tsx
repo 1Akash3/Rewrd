@@ -7,7 +7,7 @@ import {
   Settings, ShieldAlert, Star, Store, UsersRound, UserRound, ClipboardCheck,
 } from 'lucide-react';
 import { useMerchant, logoutMerchant } from '@/lib/useMerchant';
-import { NavItem, Spinner } from '@/components/ui';
+import { NavItem, Spinner, SparkleGlyph } from '@/components/ui';
 import { initials } from '@/lib/format';
 
 const iconProps = { size: 17, strokeWidth: 2.25 } as const;
@@ -65,7 +65,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Sidebar */}
       <aside className={`fixed inset-y-0 z-30 flex w-[250px] flex-col border-r-[1.5px] border-line bg-surface p-4 transition-transform md:static md:translate-x-0 ${open ? 'translate-x-0' : '-translate-x-full'}`}>
         <Link href="/dashboard" className="flex items-center gap-2.5 px-2 py-2">
-          <span className="grid h-[34px] w-[34px] place-items-center rounded-[10px] bg-red text-lg font-bold text-white shadow-hard-sm">✦</span>
+          <span className="grid h-[34px] w-[34px] place-items-center rounded-[10px] bg-red text-white shadow-hard-sm"><SparkleGlyph size={18} /></span>
           <span className="min-w-0">
             <span className="block font-head text-lg font-bold leading-tight text-ink">rewrd</span>
             <span className="block truncate text-xs text-muted">{tenant?.name ?? 'Your business'}</span>

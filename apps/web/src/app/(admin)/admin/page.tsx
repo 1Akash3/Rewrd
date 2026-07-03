@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api, tokens } from '@/lib/api';
-import { Spinner } from '@/components/ui';
+import { Spinner, SparkleGlyph } from '@/components/ui';
 import { inr, num } from '@/lib/format';
 import { logoutMerchant } from '@/lib/useMerchant';
 
@@ -56,7 +56,7 @@ export default function AdminPage() {
       <header className="sticky top-0 z-20 border-b-[1.5px] border-[#2c2c2f] bg-ink px-7 py-3.5">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="grid h-[34px] w-[34px] place-items-center rounded-[9px] bg-red text-[17px] font-bold text-white">✦</span>
+            <span className="grid h-[34px] w-[34px] place-items-center rounded-[9px] bg-red text-white"><SparkleGlyph size={18} /></span>
             <span><span className="font-head text-lg font-bold">rewrd</span> <span className="text-sm font-medium text-[#7a756d]">· Platform Admin</span></span>
           </div>
           <div className="flex items-center gap-3.5">

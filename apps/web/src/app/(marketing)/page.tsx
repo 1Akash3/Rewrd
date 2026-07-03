@@ -6,6 +6,7 @@ import {
   MapPin, Play, QrCode, Scissors, Shirt, Smartphone, Sparkles, Stamp, Star, Store,
   Ticket, UtensilsCrossed, Zap,
 } from 'lucide-react';
+import { SparkleGlyph } from '@/components/ui';
 
 type Icon = ComponentType<{ size?: number | string; strokeWidth?: number | string; className?: string }>;
 
@@ -301,7 +302,7 @@ function HeroPanel() {
         </div>
         <div className="my-5 flex flex-wrap gap-2.5">
           {Array.from({ length: 8 }, (_, i) => i < 5 ? (
-            <div key={i} className="grid h-11 w-11 place-items-center rounded-full border-2 border-ink bg-red text-lg text-white">✦</div>
+            <div key={i} className="grid h-11 w-11 place-items-center rounded-full border-2 border-ink bg-red text-white"><SparkleGlyph size={20} /></div>
           ) : (
             <div key={i} className="h-11 w-11 rounded-full border-2 border-dashed border-[#b9a9d1] bg-brand-soft" />
           ))}
