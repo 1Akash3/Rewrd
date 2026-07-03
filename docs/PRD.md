@@ -1,4 +1,4 @@
-# Product Requirements Document — Loyalty OS
+# Product Requirements Document — Rewrd
 
 ## 1. Vision
 Replace paper stamp cards with a **QR-first, no-app digital loyalty experience** that helps

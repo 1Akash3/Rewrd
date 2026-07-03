@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { ApiError, merchantApi, tokens } from '@/lib/api';
 import { Button, Field } from '@/components/ui';
+import { GoogleSignIn } from '@/components/GoogleSignIn';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -36,6 +37,7 @@ export default function LoginPage() {
         {err && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-danger">{err}</p>}
         <Button type="submit" disabled={busy} className="w-full">{busy ? 'Logging in…' : 'Log in'}</Button>
       </form>
+      <GoogleSignIn label="signin_with" />
       <p className="mt-4 text-center text-sm text-muted">New here? <Link href="/signup" className="font-semibold text-brand">Start a free trial</Link></p>
       <p className="mt-2 rounded-md bg-canvas p-2 text-center text-xs text-muted">Demo: owner@brewbean.dev / owner1234</p>
     </div>

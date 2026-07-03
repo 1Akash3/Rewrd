@@ -6,7 +6,7 @@ import { Badge, Card, Spinner } from '@/components/ui';
 import { dateStr, inr } from '@/lib/format';
 
 // Account & Plan — read-only. Payment is handled offline (UPI, direct with the
-// Loyalty OS team), and access is granted/renewed by the operator from the admin
+// Rewrd team), and access is granted/renewed by the operator from the admin
 // console. No self-serve checkout here by design.
 export default function AccountPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
@@ -46,7 +46,7 @@ export default function AccountPage() {
             {sub?.renewsAt && !isTrial && <p className="mt-1 text-xs text-muted">Access valid until {dateStr(sub.renewsAt)}</p>}
           </div>
           <a
-            href="https://wa.me/910000000000?text=Hi%2C%20I%27d%20like%20to%20upgrade%20my%20Loyalty%20OS%20plan"
+            href="https://wa.me/917744024465?text=Hi%2C%20I%27d%20like%20to%20upgrade%20my%20Loyalty%20OS%20plan"
             target="_blank" rel="noreferrer"
             className="btn-brand"
           >
@@ -60,7 +60,7 @@ export default function AccountPage() {
         <h3 className="font-semibold text-ink">How billing works</h3>
         <ol className="mt-3 space-y-2 text-sm text-muted">
           <li><span className="font-medium text-ink">1.</span> Start with a 30-day free trial — full access, no payment.</li>
-          <li><span className="font-medium text-ink">2.</span> To continue, pay the annual plan fee via UPI to our team.</li>
+          <li><span className="font-medium text-ink">2.</span> To continue, pay the monthly plan fee via UPI to our team.</li>
           <li><span className="font-medium text-ink">3.</span> We activate/renew your account instantly once payment is received.</li>
         </ol>
       </Card>
@@ -73,7 +73,7 @@ export default function AccountPage() {
             <Card key={p.id} className={`flex flex-col p-5 ${sub?.plan?.code === p.code ? 'ring-2 ring-brand' : ''}`}>
               <h3 className="font-bold text-ink">{p.name}</h3>
               <p className="mt-1 text-2xl font-extrabold text-ink">
-                {p.priceYearly > 0 ? <>{inr(p.priceYearly)}<span className="text-xs font-normal text-muted">/yr</span></> : 'Custom'}
+                {p.priceYearly > 0 ? <>{inr(p.priceYearly)}<span className="text-xs font-normal text-muted">/mo</span></> : 'Custom'}
               </p>
               <p className="mt-2 flex-1 text-sm text-muted">{p.maxBranches === -1 ? 'Unlimited' : p.maxBranches} location{p.maxBranches === 1 ? '' : 's'} · {p.maxCampaigns} campaigns</p>
               {sub?.plan?.code === p.code && <Badge tone="active">Your plan</Badge>}

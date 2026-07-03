@@ -1,8 +1,7 @@
 import type { Config } from 'tailwindcss';
 
-// Design tokens are driven by CSS variables (see src/app/globals.css) so that a
-// merged/second frontend can re-theme the whole app by overriding variables,
-// without touching component code. See docs/DESIGN-SYSTEM.md.
+// Tokens are driven by CSS variables (see src/app/globals.css) so the whole
+// app can be re-themed by overriding variables. Palette = Rewrd design system.
 const config: Config = {
   content: ['./src/**/*.{ts,tsx}'],
   theme: {
@@ -21,6 +20,13 @@ const config: Config = {
         success: 'rgb(var(--success) / <alpha-value>)',
         warn: 'rgb(var(--warn) / <alpha-value>)',
         danger: 'rgb(var(--danger) / <alpha-value>)',
+        // accent palette
+        red: 'rgb(var(--red) / <alpha-value>)',
+        lime: 'rgb(var(--lime) / <alpha-value>)',
+        citrine: 'rgb(var(--citrine) / <alpha-value>)',
+        jade: 'rgb(var(--jade) / <alpha-value>)',
+        orange: 'rgb(var(--orange) / <alpha-value>)',
+        pink: 'rgb(var(--pink) / <alpha-value>)',
       },
       borderRadius: {
         lg: 'var(--radius-lg)',
@@ -28,11 +34,16 @@ const config: Config = {
         sm: 'var(--radius-sm)',
       },
       boxShadow: {
-        card: '0 1px 2px rgb(16 24 40 / 0.06), 0 1px 3px rgb(16 24 40 / 0.10)',
-        pop: '0 12px 32px -8px rgb(16 24 40 / 0.22)',
+        // signature hard offset shadows (ink #1A1A1B)
+        hard: '4px 4px 0 #1A1A1B',
+        'hard-sm': '3px 3px 0 #1A1A1B',
+        'hard-lg': '6px 6px 0 #1A1A1B',
+        'hard-brand': '3px 3px 0 #7C44BD',
+        phone: '0 30px 70px rgba(60,20,90,0.35)',
       },
       fontFamily: {
         sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        head: ['var(--font-head)', 'system-ui', 'sans-serif'],
       },
     },
   },

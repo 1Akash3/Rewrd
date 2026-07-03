@@ -26,6 +26,10 @@ export const env = {
   trialDays: parseInt(process.env.TRIAL_DAYS ?? '30', 10),
   isProd: (process.env.NODE_ENV ?? 'development') === 'production',
 
+  // ---- Platform operator (the only superadmin login; seeded on db:setup) ----
+  adminEmail: process.env.ADMIN_EMAIL ?? 'admin@rewrd.dev',
+  adminPassword: process.env.ADMIN_PASSWORD ?? 'admin1234',
+
   // ---- Google Sign-In (auto-login) ----
   googleClientId: process.env.GOOGLE_CLIENT_ID ?? '',
 
@@ -45,12 +49,12 @@ export const env = {
 
   // ---- Email (Resend — free tier 3,000/mo) ----
   resendApiKey: process.env.RESEND_API_KEY ?? '',
-  emailFrom: process.env.EMAIL_FROM ?? 'Loyalty OS <onboarding@resend.dev>',
+  emailFrom: process.env.EMAIL_FROM ?? 'Rewrd <onboarding@resend.dev>',
 
   // ---- Web Push (VAPID) ----
   vapidPublic: process.env.VAPID_PUBLIC_KEY ?? '',
   vapidPrivate: process.env.VAPID_PRIVATE_KEY ?? '',
-  vapidSubject: process.env.VAPID_SUBJECT ?? 'mailto:support@loyaltyos.dev',
+  vapidSubject: process.env.VAPID_SUBJECT ?? 'mailto:support@rewrd.dev',
 
   // ---- Google Maps (reverse-geocode for branch detection) ----
   googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY ?? '',

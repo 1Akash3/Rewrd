@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { ApiError, merchantApi, tokens } from '@/lib/api';
 import { Button, Field } from '@/components/ui';
+import { GoogleSignIn } from '@/components/GoogleSignIn';
 
 const businessTypes = ['cafe', 'salon', 'gym', 'bakery', 'restaurant', 'boutique', 'carwash', 'other'];
 
@@ -59,6 +60,7 @@ export default function SignupPage() {
           </div>
         </form>
       )}
+      <GoogleSignIn label="signup_with" />
       <p className="mt-4 text-center text-sm text-muted">Already have an account? <Link href="/login" className="font-semibold text-brand">Log in</Link></p>
     </div>
   );

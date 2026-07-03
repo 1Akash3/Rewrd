@@ -60,7 +60,7 @@ async function sendViaMsg91(phone: string, code: string) {
 async function sendViaTwilio(phone: string, code: string) {
   const { twilioSid, twilioToken, twilioFrom } = env.otp;
   if (!twilioSid || !twilioToken || !twilioFrom) throw new Error('Twilio not configured');
-  const body = new URLSearchParams({ To: phone, From: twilioFrom, Body: `Your Loyalty OS code is ${code}` });
+  const body = new URLSearchParams({ To: phone, From: twilioFrom, Body: `Your Rewrd code is ${code}` });
   const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`, {
     method: 'POST',
     headers: { authorization: 'Basic ' + Buffer.from(`${twilioSid}:${twilioToken}`).toString('base64'), 'content-type': 'application/x-www-form-urlencoded' },

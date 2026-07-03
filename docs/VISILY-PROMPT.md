@@ -1,4 +1,4 @@
-# Visily Prompt — Loyalty OS UI
+# Visily Prompt — Rewrd UI
 
 Paste the **Master context** once, then generate each screen using its block. Visily builds
 per-screen, so create one frame per block. You supply the design system (colors, fonts, radius,
@@ -11,7 +11,7 @@ spacing) — these prompts only define **layout, sections, and real content**.
 ---
 
 ## MASTER CONTEXT (paste first)
-> I'm designing a SaaS web + mobile product called **Loyalty OS** — a QR-based digital loyalty
+> I'm designing a SaaS web + mobile product called **Rewrd** — a QR-based digital loyalty
 > platform for local businesses (cafés, salons, gyms, bakeries, restaurants, boutiques, car washes).
 > Customers scan a QR after a visit, collect digital stamps on their phone with **no app install**,
 > and unlock free rewards. Merchants manage campaigns, QR codes, branches, staff, customers and
@@ -26,7 +26,7 @@ spacing) — these prompts only define **layout, sections, and real content**.
 # SURFACE 1 — MARKETING WEBSITE (desktop, responsive)
 
 ### 1.1 Landing page
-> Long scrolling landing page. Sticky top nav: logo "Loyalty OS", links (Features, How it works,
+> Long scrolling landing page. Sticky top nav: logo "Rewrd", links (Features, How it works,
 > Pricing, Customer app), buttons "Log in" and "Start free trial".
 > **Hero (2 columns):** left — eyebrow chip "For cafés, salons, gyms, bakeries & more", H1
 > "Turn every visit into a repeat customer", subtext about launching a QR loyalty program in
@@ -55,7 +55,7 @@ spacing) — these prompts only define **layout, sections, and real content**.
 > "Book a demo". Footer with product links, legal (Terms, Privacy).
 
 ### 1.2 Role selection ("/start")
-> Simple centered page, logo on top, H1 "Welcome — how will you use Loyalty OS?". Two large choice
+> Simple centered page, logo on top, H1 "Welcome — how will you use Rewrd?". Two large choice
 > cards side by side. Card A "I'm a Business" (icon 🏬, description, primary button "Start 30-day
 > free trial", secondary "I already have an account", note "No card required"). Card B "I'm a
 > Customer" (icon 🎴, text explaining they usually just scan the QR at the counter — no app, no
@@ -164,7 +164,7 @@ spacing) — these prompts only define **layout, sections, and real content**.
 
 ### 2.14 Account paused / closed (lock state)
 > Full-screen centered card (replaces the dashboard when the operator suspends/terminates): icon,
-> H1 "Account paused" or "Account closed", explanation, "Contact Loyalty OS" button (WhatsApp),
+> H1 "Account paused" or "Account closed", explanation, "Contact Rewrd" button (WhatsApp),
 > "Log out".
 
 ---
@@ -211,7 +211,7 @@ spacing) — these prompts only define **layout, sections, and real content**.
 # SURFACE 4 — OPERATOR ADMIN CONSOLE (desktop web)
 
 ### 4.1 Admin overview
-> Top bar "Loyalty OS · Platform Admin". KPI tiles: Merchants (with active/trial split), Customers,
+> Top bar "Rewrd · Platform Admin". KPI tiles: Merchants (with active/trial split), Customers,
 > Stamps issued, (optional) ARR. 
 
 ### 4.2 Merchants — manage access

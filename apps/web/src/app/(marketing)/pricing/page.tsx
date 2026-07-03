@@ -18,7 +18,7 @@ export default function PricingPage() {
   return (
     <main className="mx-auto max-w-6xl px-5 py-16">
       <div className="text-center">
-        <h1 className="text-4xl font-bold text-ink">Simple annual pricing</h1>
+        <h1 className="text-4xl font-bold text-ink">Simple monthly pricing</h1>
         <p className="mx-auto mt-3 max-w-xl text-muted">Pick a plan by number of locations. Every plan starts with a 30-day free trial — no payment required to start.</p>
       </div>
 
@@ -31,7 +31,7 @@ export default function PricingPage() {
               {p.code === 'growth' && <span className="chip mb-3 w-fit bg-brand text-brand-fg">Most popular</span>}
               <h3 className="text-lg font-bold text-ink">{p.name}</h3>
               <p className="mt-2 text-3xl font-extrabold text-ink">
-                {p.priceYearly > 0 ? <>{inr(p.priceYearly)}<span className="text-sm font-normal text-muted">/yr</span></> : 'Custom'}
+                {p.priceYearly > 0 ? <>{inr(p.priceYearly)}<span className="text-sm font-normal text-muted">/mo</span></> : 'Custom'}
               </p>
               <ul className="mt-5 flex-1 space-y-2 text-sm text-muted">
                 <li>✓ {p.maxBranches === -1 ? 'Unlimited' : p.maxBranches} location{p.maxBranches === 1 ? '' : 's'}</li>

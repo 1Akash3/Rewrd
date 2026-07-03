@@ -115,7 +115,7 @@ customerRouter.delete(
     const id = meId(req);
     await prisma.customer.update({
       where: { id },
-      data: { name: null, email: null, birthday: null, anniversary: null, phone: `deleted:${id}`, consentAt: null },
+      data: { name: null, email: null, birthday: null, anniversary: null, phone: null, consentAt: null },
     });
     await track('customer_deletion', { customerId: id });
     ok(res, { deleted: true });

@@ -50,12 +50,12 @@ async function run() {
     const resolve = await j('GET', `/public/resolve/${qr.token}`);
     assert(resolve.status === 200 && resolve.json.data?.tenant, 'public QR resolve works');
 
-    // 5) Customer OTP login
-    const phone = `+91999${Math.floor(1000000 + Math.random() * 8999999)}`;
-    const otpReq = await j('POST', '/auth/customer/otp/request', { phone });
-    assert(!!otpReq.json.data?.devCode, 'OTP requested (dev echo)');
-    const otpVer = await j('POST', '/auth/customer/otp/verify', { phone, code: otpReq.json.data.devCode, name: 'Test Customer' });
-    assert(otpVer.status === 200 && otpVer.json.data?.token, 'OTP verified, customer token issued');
+    // 5) Customer email-OTP login (phone captured as optional contact data)
+    const custEmail = `cust+${Date.now()}@test.dev`;
+    const otpReq = await j('POST', '/auth/customer/otp/request', { email: custEmail });
+    assert(!!otpReq.json.data?.devCode, 'email OTP requested (dev echo)');
+    const otpVer = await j('POST', '/auth/customer/otp/verify', { email: custEmail, code: otpReq.json.data.devCode, name: 'Test Customer', phone: '+919812345678' });
+    assert(otpVer.status === 200 && otpVer.json.data?.token, 'email OTP verified, customer token issued');
     const cToken = otpVer.json.data.token;
 
     // 6) Earn stamps to threshold → reward unlock

@@ -73,7 +73,13 @@ export const merchantApi = {
     api.post<{ token: string; tenant: Tenant; user: MerchantUser }>('/auth/merchant/signup', b),
   login: (b: { email: string; password: string }) =>
     api.post<{ token: string; tenant: Tenant | null; user: MerchantUser }>('/auth/merchant/login', b),
+  // Google Sign-In: `credential` is the ID token from Google Identity Services.
+  // Existing account -> logged in; new account -> tenant auto-provisioned.
+  google: (credential: string) =>
+    api.post<{ token: string; tenant: Tenant | null; user: MerchantUser }>('/auth/merchant/google', { credential }),
   me: () => api.get<{ kind: string; user: MerchantUser; tenant: Tenant | null }>('/auth/me', 'merchant'),
+  updateTenant: (b: { name?: string; brandColor?: string; reviewLink?: string | null; instagram?: string | null }) =>
+    api.patch<Tenant>('/auth/tenant', b, 'merchant'),
 
   campaigns: () => api.get<Campaign[]>('/campaigns', 'merchant'),
   createCampaign: (b: Partial<Campaign>) => api.post<Campaign>('/campaigns', b, 'merchant'),
@@ -82,6 +88,9 @@ export const merchantApi = {
   qrCodes: () => api.get<QRCode[]>('/qr', 'merchant'),
   createQr: (b: { label: string; kind: string; branchId?: string; campaignId?: string }) => api.post<QRCode>('/qr', b, 'merchant'),
 
+  pendingApprovals: () => api.get<any[]>('/stamps/pending', 'merchant'),
+  approveStamp: (eventId: string) => api.post<any>(`/stamps/${eventId}/approve`, {}, 'merchant'),
+
   overview: () => api.get<Overview>('/analytics/overview', 'merchant'),
   trend: () => api.get<{ date: string; scans: number }[]>('/analytics/trend', 'merchant'),
   breakdown: () => api.get<{ newUsers: number; returning: number; popularHours: { hour: number; count: number }[] }>('/analytics/breakdown', 'merchant'),
@@ -89,6 +98,7 @@ export const merchantApi = {
 
   customers: (segment?: string) => api.get<CrmCustomer[]>(`/crm/customers${segment ? `?segment=${segment}` : ''}`, 'merchant'),
   segments: () => api.get<{ total: number; counts: Record<string, number> }>('/crm/segments', 'merchant'),
+  remindCustomer: (customerId: string) => api.post<any>(`/crm/customers/${customerId}/remind`, {}, 'merchant'),
 
   rewards: (status?: string) => api.get<any[]>(`/rewards${status ? `?status=${status}` : ''}`, 'merchant'),
   lookupReward: (token: string) => api.get<any>(`/rewards/lookup/${token}`, 'merchant'),
@@ -113,9 +123,13 @@ export const merchantApi = {
 };
 
 export const customerApi = {
-  requestOtp: (phone: string) => api.post<{ sent: boolean; devCode?: string }>('/auth/customer/otp/request', { phone }),
-  verifyOtp: (phone: string, code: string, name?: string) =>
-    api.post<{ token: string; customer: { id: string; phone: string; name: string | null } }>('/auth/customer/otp/verify', { phone, code, name }),
+  // Customer auth is email-OTP (free — no SMS gateway needed). Phone is optional profile data.
+  requestOtp: (email: string) => api.post<{ sent: boolean; devCode?: string }>('/auth/customer/otp/request', { email }),
+  verifyOtp: (email: string, code: string, name?: string, phone?: string) =>
+    api.post<{ token: string; customer: { id: string; email: string; phone: string | null; name: string | null } }>('/auth/customer/otp/verify', { email, code, name, phone }),
+
+  nearbyOffers: (lat?: number, lng?: number) =>
+    api.get<NearbyOffer[]>(lat != null && lng != null ? `/public/offers/nearby?lat=${lat}&lng=${lng}` : '/public/offers/nearby'),
 
   resolveQr: (token: string) => api.get<any>(`/public/resolve/${token}`),
   earn: (b: { token: string; campaignId: string; deviceFp?: string; lat?: number; lng?: number }) =>
@@ -125,4 +139,14 @@ export const customerApi = {
   wallet: () => api.get<RewardWalletItem[]>('/me/rewards', 'customer'),
   history: () => api.get<any[]>('/me/history', 'customer'),
   updateProfile: (b: any) => api.patch<any>('/me/profile', b, 'customer'),
+};
+
+export type NearbyOffer = {
+  tenantId: string;
+  name: string;
+  slug: string;
+  brandColor: string | null;
+  campaign: { id: string; name: string; rewardTitle: string; stampsRequired: number };
+  branch: { name: string; city: string | null; lat: number | null; lng: number | null } | null;
+  distanceMeters: number | null;
 };

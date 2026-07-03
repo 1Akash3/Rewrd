@@ -1,4 +1,4 @@
-// Loyalty OS — canonical data model.
+// Rewrd — canonical data model.
 // Runs on SQLite for zero-config local dev; swap `provider` to "postgresql"
 // (and DATABASE_URL) for production. Enum-like fields are stored as String with
 // documented allowed values so the schema is portable across both providers.
@@ -27,6 +27,9 @@ model Tenant {
   logoUrl       String?
   status        String   @default("trial") // trial|active|past_due|suspended|cancelled
   gstNumber     String?
+  // Growth links (Settings -> Growth): review prompt + social handle.
+  reviewLink    String?
+  instagram     String?
   kycStatus     String   @default("unverified") // unverified|pending|verified|rejected
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -95,9 +98,9 @@ model Branch {
 
 model Customer {
   id            String   @id @default(cuid())
-  phone         String   @unique
+  email         String?  @unique // login identity (verified via email OTP)
+  phone         String?  // contact captured for CRM/reminders; not used for login
   name          String?
-  email         String?
   birthday      DateTime?
   anniversary   DateTime?
   consentAt     DateTime?  // marketing/contact consent timestamp (null = no consent)
@@ -305,7 +308,8 @@ model BillingInvoice {
 
 model OtpChallenge {
   id            String   @id @default(cuid())
-  phone         String
+  email         String?  // email login (primary customer verification channel)
+  phone         String?  // legacy SMS channel (unused by default)
   codeHash      String
   purpose       String   @default("customer_login") // customer_login|merchant_login
   attempts      Int      @default(0)
@@ -313,7 +317,7 @@ model OtpChallenge {
   consumedAt    DateTime?
   createdAt     DateTime @default(now())
 
-  @@index([phone, purpose])
+  @@index([email, purpose])
 }
 
 model DeviceProfile {

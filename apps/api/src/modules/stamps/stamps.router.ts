@@ -11,6 +11,27 @@ import { pushToCustomer } from '../../lib/push.js';
 
 export const stampsRouter = Router();
 
+stampsRouter.get(
+  '/pending',
+  requireRole('owner', 'branch_manager', 'staff'),
+  asyncHandler(async (req, res) => {
+    const p = req.principal as { tenantId: string };
+    const items = await prisma.stampEvent.findMany({
+      where: {
+        campaign: { tenantId: p.tenantId },
+        status: 'pending',
+      },
+      include: {
+        customer: { select: { id: true, name: true, phone: true, email: true } },
+        campaign: { select: { id: true, name: true, rewardTitle: true } },
+        branch: { select: { id: true, name: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+    ok(res, items);
+  }),
+);
+
 const earnSchema = z.object({
   token: z.string(), // QR token
   campaignId: z.string(),

@@ -14,8 +14,8 @@ import { audit, track } from '../../lib/events.js';
 import { asyncHandler, ok, validate } from '../../lib/http.js';
 import { rateLimit } from '../../middleware/rateLimit.js';
 import { env } from '../../config/env.js';
-import { requireAuth } from '../../middleware/auth.js';
-import { sendOtp } from '../../lib/otp-provider.js';
+import { requireAuth, requireRole } from '../../middleware/auth.js';
+import { sendEmail } from '../../lib/mailer.js';
 import { OAuth2Client } from 'google-auth-library';
 
 const googleClient = new OAuth2Client(env.googleClientId);
@@ -111,37 +111,46 @@ authRouter.post(
   }),
 );
 
-/* ---------------------------- Customer OTP flow --------------------------- */
+/* ---------------------- Customer email-OTP flow (free) -------------------- */
+// Customers verify with a code sent to their EMAIL (free via Resend; echoed in
+// dev). Phone is captured as optional CRM contact data only — never used to log in.
 authRouter.post(
   '/customer/otp/request',
-  rateLimit({ windowMs: 60_000, max: 5, key: (r) => (r.body?.phone ?? r.ip) as string }),
+  rateLimit({ windowMs: 60_000, max: 5, key: (r) => (r.body?.email ?? r.ip) as string }),
   asyncHandler(async (req, res) => {
-    const { phone } = validate(z.object({ phone: z.string().min(6) }), req.body);
+    const { email } = validate(z.object({ email: z.string().email() }), req.body);
     const code = genOtp();
     await prisma.otpChallenge.create({
       data: {
-        phone,
+        email: email.toLowerCase(),
         codeHash: await hashOtp(code),
         purpose: 'customer_login',
         expiresAt: new Date(Date.now() + env.otpTtlSeconds * 1000),
       },
     });
-    // Dispatch via the configured provider (echo in dev, WhatsApp/MSG91/Twilio in prod).
-    await sendOtp(phone, code);
+    // Deliver by email. In dev (no RESEND key) this logs a stub; we echo the code.
+    await sendEmail({
+      to: email,
+      subject: `Your Rewrd code is ${code}`,
+      html: `<div style="font-family:system-ui;padding:24px"><h2>Your verification code</h2><p style="font-size:32px;font-weight:700;letter-spacing:4px">${code}</p><p style="color:#666">This code expires in ${Math.round(env.otpTtlSeconds / 60)} minutes.</p></div>`,
+    });
+    // eslint-disable-next-line no-console
+    console.log(`[otp:email] ${email} -> ${code}`);
     ok(res, { sent: true, ...(env.otpDevEcho ? { devCode: code } : {}) });
   }),
 );
 
 authRouter.post(
   '/customer/otp/verify',
-  rateLimit({ windowMs: 60_000, max: 10, key: (r) => (r.body?.phone ?? r.ip) as string }),
+  rateLimit({ windowMs: 60_000, max: 10, key: (r) => (r.body?.email ?? r.ip) as string }),
   asyncHandler(async (req, res) => {
-    const { phone, code, name, email } = validate(
-      z.object({ phone: z.string().min(6), code: z.string().length(6), name: z.string().optional(), email: z.string().email().optional() }),
+    const { email, code, name, phone } = validate(
+      z.object({ email: z.string().email(), code: z.string().length(6), name: z.string().optional(), phone: z.string().optional() }),
       req.body,
     );
+    const lower = email.toLowerCase();
     const challenge = await prisma.otpChallenge.findFirst({
-      where: { phone, purpose: 'customer_login', consumedAt: null, expiresAt: { gt: new Date() } },
+      where: { email: lower, purpose: 'customer_login', consumedAt: null, expiresAt: { gt: new Date() } },
       orderBy: { createdAt: 'desc' },
     });
     if (!challenge) throw badRequest('Code expired or not found. Please request a new one.');
@@ -155,13 +164,13 @@ authRouter.post(
     await prisma.otpChallenge.update({ where: { id: challenge.id }, data: { consumedAt: new Date() } });
 
     const customer = await prisma.customer.upsert({
-      where: { phone },
-      update: { ...(name ? { name } : {}), ...(email ? { email } : {}) },
-      create: { phone, name, email },
+      where: { email: lower },
+      update: { ...(name ? { name } : {}), ...(phone ? { phone } : {}) },
+      create: { email: lower, name, phone },
     });
     await track('customer_login', { customerId: customer.id });
-    const token = signToken({ kind: 'customer', id: customer.id, phone: customer.phone });
-    ok(res, { token, customer: { id: customer.id, phone: customer.phone, name: customer.name } });
+    const token = signToken({ kind: 'customer', id: customer.id, email: customer.email });
+    ok(res, { token, customer: { id: customer.id, email: customer.email, phone: customer.phone, name: customer.name } });
   }),
 );
 
@@ -184,6 +193,11 @@ authRouter.post(
       where: { OR: [{ googleId: payload.sub }, { email: payload.email }] },
       include: { tenant: true },
     });
+
+    // The operator account must never be reachable via Google — otherwise
+    // whoever controls a Google account with the admin email could link into
+    // platform admin. Password login only for superadmin.
+    if (user?.role === 'superadmin') throw unauthorized('This account requires password login.');
 
     if (!user) {
       // One-click signup: provision a tenant + owner from the Google profile.
@@ -237,7 +251,34 @@ authRouter.get(
     ok(res, {
       kind: 'user',
       user: { id: u.id, name: u.name, role: u.role, email: u.email, branchId: u.branchId },
-      tenant: u.tenant ? { id: u.tenant.id, name: u.tenant.name, slug: u.tenant.slug, brandColor: u.tenant.brandColor, status: u.tenant.status } : null,
+      tenant: u.tenant
+        ? { id: u.tenant.id, name: u.tenant.name, slug: u.tenant.slug, brandColor: u.tenant.brandColor, status: u.tenant.status, reviewLink: u.tenant.reviewLink, instagram: u.tenant.instagram }
+        : null,
     });
+  }),
+);
+
+/* --------------------- Tenant settings (owner-editable) ------------------- */
+// Business profile + growth links from the dashboard Settings page. Slug is
+// intentionally immutable here (it's printed on QR posters and public URLs).
+authRouter.patch(
+  '/tenant',
+  requireAuth,
+  requireRole('owner'),
+  asyncHandler(async (req, res) => {
+    const p = req.principal!;
+    if (p.kind !== 'user' || !p.tenantId) throw unauthorized();
+    const body = validate(
+      z.object({
+        name: z.string().min(2).max(80).optional(),
+        brandColor: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
+        reviewLink: z.string().url().max(300).nullable().optional().or(z.literal('').transform(() => null)),
+        instagram: z.string().max(60).nullable().optional().or(z.literal('').transform(() => null)),
+      }),
+      req.body,
+    );
+    const tenant = await prisma.tenant.update({ where: { id: p.tenantId }, data: body });
+    await audit({ tenantId: tenant.id, actorId: p.id, action: 'tenant.settings.update', target: tenant.id });
+    ok(res, { id: tenant.id, name: tenant.name, slug: tenant.slug, brandColor: tenant.brandColor, reviewLink: tenant.reviewLink, instagram: tenant.instagram });
   }),
 );

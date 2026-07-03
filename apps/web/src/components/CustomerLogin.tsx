@@ -1,12 +1,14 @@
 'use client';
 import { useState } from 'react';
+import { ArrowLeft, Mail, ShieldCheck } from 'lucide-react';
 import { customerApi, tokens } from '@/lib/api';
-import { Button, Field } from '@/components/ui';
+import { Button, Field, Logo } from '@/components/ui';
 
-// Inline OTP login used across the customer app. On success, calls onDone.
+// Inline email-OTP login used across the customer app. Email is free to send
+// (no SMS gateway); in dev the code is echoed back so testing needs no inbox.
 export function CustomerLogin({ onDone, heading = 'Sign in to your rewards' }: { onDone: () => void; heading?: string }) {
-  const [step, setStep] = useState<'phone' | 'code'>('phone');
-  const [phone, setPhone] = useState('+91');
+  const [step, setStep] = useState<'email' | 'code'>('email');
+  const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [name, setName] = useState('');
   const [devCode, setDevCode] = useState('');
@@ -16,15 +18,16 @@ export function CustomerLogin({ onDone, heading = 'Sign in to your rewards' }: {
   async function requestOtp(e: React.FormEvent) {
     e.preventDefault(); setBusy(true); setErr('');
     try {
-      const r = await customerApi.requestOtp(phone);
+      const r = await customerApi.requestOtp(email.trim());
       if (r.devCode) { setDevCode(r.devCode); setCode(r.devCode); }
       setStep('code');
     } catch (e: any) { setErr(e.message); } finally { setBusy(false); }
   }
+
   async function verify(e: React.FormEvent) {
     e.preventDefault(); setBusy(true); setErr('');
     try {
-      const r = await customerApi.verifyOtp(phone, code, name || undefined);
+      const r = await customerApi.verifyOtp(email.trim(), code.trim(), name.trim() || undefined);
       tokens.set('customer', r.token);
       onDone();
     } catch (e: any) { setErr(e.message); setBusy(false); }
@@ -32,24 +35,52 @@ export function CustomerLogin({ onDone, heading = 'Sign in to your rewards' }: {
 
   return (
     <div className="mx-auto w-full max-w-sm px-5 py-10">
-      <div className="mb-6 text-center">
-        <div className="mx-auto mb-3 grid h-14 w-14 place-items-center rounded-2xl bg-brand text-2xl text-brand-fg">◎</div>
-        <h1 className="text-xl font-bold text-ink">{heading}</h1>
-        <p className="mt-1 text-sm text-muted">No app needed — sign in with your mobile number.</p>
+      <div className="mb-7 text-center">
+        <Logo className="justify-center" />
+        <h1 className="mt-5 font-head text-2xl font-bold text-ink">{heading}</h1>
+        <p className="mt-1.5 text-sm text-muted">No app, no password — a code lands in your inbox.</p>
       </div>
-      {step === 'phone' ? (
+
+      {step === 'email' ? (
         <form onSubmit={requestOtp} className="space-y-4">
-          <Field label="Mobile number"><input className="input" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 98765 43210" required /></Field>
-          {err && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-danger">{err}</p>}
-          <Button type="submit" disabled={busy} className="w-full">{busy ? 'Sending…' : 'Send OTP'}</Button>
+          <Field label="Email address">
+            <div className="relative">
+              <Mail size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" aria-hidden />
+              <input className="input !pl-10" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required autoFocus />
+            </div>
+          </Field>
+          {err && <p className="rounded-md bg-red/10 px-3 py-2 text-sm text-danger">{err}</p>}
+          <Button type="submit" disabled={busy || !email.includes('@')} className="w-full">{busy ? 'Sending code…' : 'Email me a code'}</Button>
         </form>
       ) : (
         <form onSubmit={verify} className="space-y-4">
-          <Field label="Enter OTP" hint={devCode ? `Dev code: ${devCode}` : `Sent to ${phone}`}><input className="input text-center text-lg tracking-widest" value={code} onChange={(e) => setCode(e.target.value)} maxLength={6} required /></Field>
-          <Field label="Your name (first time only)"><input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="Optional" /></Field>
-          {err && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-danger">{err}</p>}
-          <Button type="submit" disabled={busy} className="w-full">{busy ? 'Verifying…' : 'Verify & continue'}</Button>
-          <button type="button" className="w-full text-center text-sm text-muted" onClick={() => setStep('phone')}>← Change number</button>
+          <Field label="6-digit code" hint={devCode ? `Dev code: ${devCode}` : `Sent to ${email}`}>
+            <input
+              className="input text-center font-head text-2xl font-bold tracking-[0.4em]"
+              value={code}
+              onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              placeholder="••••••"
+              required
+              autoFocus
+            />
+          </Field>
+          <Field label="Your name (first time only)">
+            <input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="Optional" />
+          </Field>
+          {err && <p className="rounded-md bg-red/10 px-3 py-2 text-sm text-danger">{err}</p>}
+          <Button type="submit" disabled={busy || code.length !== 6} className="w-full">
+            <ShieldCheck size={16} aria-hidden /> {busy ? 'Verifying…' : 'Verify & continue'}
+          </Button>
+          <div className="flex items-center justify-between text-sm">
+            <button type="button" className="inline-flex items-center gap-1 text-muted hover:text-ink" onClick={() => { setStep('email'); setCode(''); setErr(''); }}>
+              <ArrowLeft size={14} aria-hidden /> Change email
+            </button>
+            <button type="button" className="font-semibold text-brand hover:underline" disabled={busy} onClick={(e) => requestOtp(e as any)}>
+              Resend code
+            </button>
+          </div>
         </form>
       )}
     </div>

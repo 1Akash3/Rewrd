@@ -33,3 +33,6 @@ Thumbs.db
 
 # Test/coverage
 coverage/
+
+# TS build info
+*.tsbuildinfo

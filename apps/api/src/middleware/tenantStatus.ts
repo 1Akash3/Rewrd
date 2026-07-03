@@ -20,8 +20,8 @@ export function enforceTenantStatus(req: Request, _res: Response, next: NextFunc
             403,
             'account_' + tenant.status,
             tenant.status === 'suspended'
-              ? 'Your account is paused. Please contact Loyalty OS to reactivate.'
-              : 'This account has been closed. Please contact Loyalty OS.',
+              ? 'Your account is paused. Please contact Rewrd to reactivate.'
+              : 'This account has been closed. Please contact Rewrd.',
           ),
         );
       }

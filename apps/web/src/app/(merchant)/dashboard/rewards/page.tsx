@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { Gift } from 'lucide-react';
 import { merchantApi } from '@/lib/api';
 import { Badge, Button, Card, Field, Spinner } from '@/components/ui';
 import { dateStr } from '@/lib/format';
@@ -41,7 +42,7 @@ export default function RewardsPage() {
         {lookup && (
           <div className="mt-4 flex items-center justify-between rounded-md bg-canvas p-4">
             <div>
-              <p className="font-semibold text-ink">🎁 {lookup.rewardTitle}</p>
+              <p className="flex items-center gap-1.5 font-semibold text-ink"><Gift size={15} className="text-brand" aria-hidden /> {lookup.rewardTitle}</p>
               <p className="text-sm text-muted">{lookup.campaign?.name} · {lookup.customer?.name ?? lookup.customer?.phone}</p>
               <p className="mt-1 text-xs text-muted">Status: <Badge tone={lookup.status}>{lookup.status}</Badge> {lookup.expiresAt && `· expires ${dateStr(lookup.expiresAt)}`}</p>
             </div>
@@ -55,22 +56,24 @@ export default function RewardsPage() {
         {!items ? <div className="p-5"><Spinner /></div> : items.length === 0 ? (
           <p className="p-6 text-center text-sm text-muted">No rewards unlocked yet.</p>
         ) : (
-          <table className="w-full text-sm">
-            <thead className="border-b border-line bg-canvas text-left text-xs uppercase tracking-wide text-muted">
-              <tr><th className="px-4 py-3">Reward</th><th className="px-4 py-3">Customer</th><th className="px-4 py-3">Campaign</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">Expires</th></tr>
-            </thead>
-            <tbody>
-              {items.map((r) => (
-                <tr key={r.id} className="border-b border-line last:border-0 hover:bg-canvas">
-                  <td className="px-4 py-3 font-medium text-ink">{r.rewardTitle}</td>
-                  <td className="px-4 py-3 text-muted">{r.customer?.name ?? r.customer?.phone}</td>
-                  <td className="px-4 py-3 text-muted">{r.campaign?.name}</td>
-                  <td className="px-4 py-3"><Badge tone={r.status}>{r.status}</Badge></td>
-                  <td className="px-4 py-3 text-muted">{dateStr(r.expiresAt)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="border-b border-line bg-canvas text-left text-xs uppercase tracking-wide text-muted">
+                <tr><th className="px-4 py-3">Reward</th><th className="px-4 py-3">Customer</th><th className="px-4 py-3">Campaign</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">Expires</th></tr>
+              </thead>
+              <tbody>
+                {items.map((r) => (
+                  <tr key={r.id} className="border-b border-line last:border-0 hover:bg-canvas">
+                    <td className="px-4 py-3 font-medium text-ink">{r.rewardTitle}</td>
+                    <td className="px-4 py-3 text-muted">{r.customer?.name ?? r.customer?.phone}</td>
+                    <td className="px-4 py-3 text-muted">{r.campaign?.name}</td>
+                    <td className="px-4 py-3"><Badge tone={r.status}>{r.status}</Badge></td>
+                    <td className="px-4 py-3 text-muted">{dateStr(r.expiresAt)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </Card>
     </div>

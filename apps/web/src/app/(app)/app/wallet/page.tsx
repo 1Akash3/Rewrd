@@ -4,7 +4,8 @@ import { customerApi } from '@/lib/api';
 import type { RewardWalletItem } from '@/lib/types';
 import { useCustomer } from '@/lib/useCustomer';
 import { CustomerLogin } from '@/components/CustomerLogin';
-import { Badge, EmptyState, Spinner } from '@/components/ui';
+import { Gift } from 'lucide-react';
+import { Badge, EmptyState, SkeletonList, Spinner } from '@/components/ui';
 import { dateStr } from '@/lib/format';
 
 export default function WalletPage() {
@@ -13,13 +14,13 @@ export default function WalletPage() {
   const [reload, setReload] = useState(0);
   useEffect(() => { if (customer) customerApi.wallet().then(setItems).catch(() => setItems([])); }, [customer, reload]);
 
-  if (loading) return <div className="grid min-h-screen place-items-center"><Spinner /></div>;
+  if (loading) return <div className="px-4 pt-6"><SkeletonList count={2} /></div>;
   if (!customer) return <CustomerLogin onDone={() => setReload((r) => r + 1)} heading="Sign in to see your rewards" />;
 
   return (
     <div className="px-4 pt-6">
       <h1 className="mb-5 text-2xl font-bold text-ink">Reward wallet</h1>
-      {!items ? <Spinner /> : items.length === 0 ? (
+      {!items ? <SkeletonList count={2} /> : items.length === 0 ? (
         <EmptyState title="No rewards yet" hint="Fill a stamp card to unlock your first reward." />
       ) : (
         <div className="space-y-4">
@@ -27,7 +28,7 @@ export default function WalletPage() {
             <div key={r.id} className={`card overflow-hidden ${r.status !== 'unlocked' ? 'opacity-60' : ''}`}>
               <div className="px-5 py-4">
                 <div className="flex items-center justify-between">
-                  <p className="font-semibold text-ink">🎁 {r.rewardTitle}</p>
+                  <p className="flex items-center gap-1.5 font-semibold text-ink"><Gift size={15} className="text-brand" aria-hidden /> {r.rewardTitle}</p>
                   <Badge tone={r.status}>{r.status}</Badge>
                 </div>
                 <p className="text-sm text-muted">{r.brand} · {r.campaign}</p>

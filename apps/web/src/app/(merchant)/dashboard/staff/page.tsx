@@ -25,27 +25,29 @@ export default function StaffPage() {
 
       {!staff ? <Spinner /> : (
         <Card className="overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="border-b border-line bg-canvas text-left text-xs uppercase tracking-wide text-muted">
-              <tr><th className="px-4 py-3">Name</th><th className="px-4 py-3">Role</th><th className="px-4 py-3">Branch</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">Last login</th></tr>
-            </thead>
-            <tbody>
-              {staff.map((s) => (
-                <tr key={s.id} className="border-b border-line last:border-0 hover:bg-canvas">
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-3">
-                      <div className="grid h-8 w-8 place-items-center rounded-full bg-brand-soft text-xs font-bold text-brand">{initials(s.name)}</div>
-                      <div><p className="font-medium text-ink">{s.name}</p><p className="text-xs text-muted">{s.email}</p></div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 capitalize"><Badge>{s.role.replace('_', ' ')}</Badge></td>
-                  <td className="px-4 py-3 text-muted">{s.branch?.name ?? 'All'}</td>
-                  <td className="px-4 py-3"><Badge tone={s.status === 'active' ? 'active' : 'low'}>{s.status}</Badge></td>
-                  <td className="px-4 py-3 text-muted">{timeAgo(s.lastLoginAt)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="border-b border-line bg-canvas text-left text-xs uppercase tracking-wide text-muted">
+                <tr><th className="px-4 py-3">Name</th><th className="px-4 py-3">Role</th><th className="px-4 py-3">Branch</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">Last login</th></tr>
+              </thead>
+              <tbody>
+                {staff.map((s) => (
+                  <tr key={s.id} className="border-b border-line last:border-0 hover:bg-canvas">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="grid h-8 w-8 place-items-center rounded-full bg-brand-soft text-xs font-bold text-brand">{initials(s.name)}</div>
+                        <div><p className="font-medium text-ink">{s.name}</p><p className="text-xs text-muted">{s.email}</p></div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 capitalize"><Badge>{s.role.replace('_', ' ')}</Badge></td>
+                    <td className="px-4 py-3 text-muted">{s.branch?.name ?? 'All'}</td>
+                    <td className="px-4 py-3"><Badge tone={s.status === 'active' ? 'active' : 'low'}>{s.status}</Badge></td>
+                    <td className="px-4 py-3 text-muted">{timeAgo(s.lastLoginAt)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </Card>
       )}
     </div>

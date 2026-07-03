@@ -92,7 +92,7 @@ qrPublicRouter.get(
     const qr = await prisma.qRCode.findUnique({
       where: { token: req.params.token },
       include: {
-        tenant: { select: { id: true, name: true, slug: true, brandColor: true, logoUrl: true, status: true } },
+        tenant: { select: { id: true, name: true, slug: true, brandColor: true, logoUrl: true, status: true, reviewLink: true, instagram: true } },
         branch: true,
         campaign: true,
       },

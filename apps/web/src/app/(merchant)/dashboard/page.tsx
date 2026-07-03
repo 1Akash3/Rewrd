@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { ShieldAlert } from 'lucide-react';
 import { merchantApi } from '@/lib/api';
 import type { Overview } from '@/lib/types';
 import { BarChart, Card, Spinner, StatTile } from '@/components/ui';
@@ -81,7 +82,7 @@ export default function OverviewPage() {
           <h2 className="mb-4 font-semibold text-ink">Popular visit times</h2>
           <BarChart data={(breakdown?.popularHours ?? []).filter((_, i) => i >= 7 && i <= 22).map((h) => ({ label: `${h.hour}`, value: h.count }))} height={140} />
           {o.openFraudAlerts > 0 && (
-            <div className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-danger">🛡 {o.openFraudAlerts} open fraud alert(s) need review.</div>
+            <div className="mt-4 flex items-center gap-2 rounded-md bg-red/10 px-3 py-2 text-sm text-danger"><ShieldAlert size={15} aria-hidden /> {o.openFraudAlerts} open fraud alert(s) need review.</div>
           )}
         </Card>
       </div>

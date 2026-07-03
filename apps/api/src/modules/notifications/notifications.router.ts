@@ -39,7 +39,7 @@ notificationsRouter.post(
   requireCustomer,
   asyncHandler(async (req, res) => {
     const customerId = (req.principal as { id: string }).id;
-    await pushToCustomer(customerId, { title: 'Loyalty OS', body: 'Push notifications are working! 🎉', url: '/app' });
+    await pushToCustomer(customerId, { title: 'Rewrd', body: 'Push notifications are working! 🎉', url: '/app' });
     ok(res, { sent: pushEnabled });
   }),
 );

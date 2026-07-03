@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api, tokens } from '@/lib/api';
-import { Badge, Card, Spinner, StatTile } from '@/components/ui';
+import { Spinner } from '@/components/ui';
 import { inr, num } from '@/lib/format';
 import { logoutMerchant } from '@/lib/useMerchant';
 
@@ -44,65 +44,92 @@ export default function AdminPage() {
     setBusy('');
   }
 
-  if (err) return <div className="grid min-h-screen place-items-center px-5 text-center"><div><p className="text-danger">{err}</p><button className="btn-outline mt-4" onClick={() => logoutMerchant(router)}>Switch account</button></div></div>;
-  if (!ov) return <div className="grid min-h-screen place-items-center"><Spinner label="Loading platform…" /></div>;
+  if (err) return <div className="grid min-h-screen place-items-center bg-[#141416] px-5 text-center"><div><p className="text-red">{err}</p><button className="btn-outline mt-4 !bg-white" onClick={() => logoutMerchant(router)}>Switch account</button></div></div>;
+  if (!ov) return <div className="grid min-h-screen place-items-center bg-[#141416]"><Spinner label="Loading platform…" /></div>;
+
+  // Dark operator console — per the Rewrd Admin mockup (bg #141416, cards
+  // #1e1e21 with #2c2c2f hairlines, lime/purple accents).
+  const card = 'rounded-2xl border-[1.5px] border-[#2c2c2f] bg-[#1e1e21]';
 
   return (
-    <div className="min-h-screen">
-      <header className="border-b border-line bg-surface px-6 py-4">
+    <div className="min-h-screen bg-[#141416] text-[#f4f2ee]">
+      <header className="sticky top-0 z-20 border-b-[1.5px] border-[#2c2c2f] bg-ink px-7 py-3.5">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <div className="flex items-center gap-2 font-bold text-ink"><span className="grid h-8 w-8 place-items-center rounded-lg bg-ink text-white">◎</span> Loyalty OS · Platform Admin</div>
-          <button className="btn-ghost text-sm" onClick={() => logoutMerchant(router)}>Log out</button>
+          <div className="flex items-center gap-3">
+            <span className="grid h-[34px] w-[34px] place-items-center rounded-[9px] bg-red text-[17px] font-bold text-white">✦</span>
+            <span><span className="font-head text-lg font-bold">rewrd</span> <span className="text-sm font-medium text-[#7a756d]">· Platform Admin</span></span>
+          </div>
+          <div className="flex items-center gap-3.5">
+            <span className="rounded-full bg-[#2c2c2f] px-3 py-1.5 text-[12.5px] font-semibold text-lime">Operator</span>
+            <button className="text-sm text-[#9a948a] hover:text-white" onClick={() => logoutMerchant(router)}>Log out</button>
+          </div>
         </div>
       </header>
-      <main className="mx-auto max-w-6xl space-y-6 p-6">
+      <main className="mx-auto max-w-6xl space-y-6 p-7">
+        <h1 className="font-head text-[26px] font-bold">Platform overview</h1>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatTile label="Merchants" value={num(ov.tenants)} sub={`${num(ov.activeTenants)} active · ${num(ov.trialTenants)} trial`} accent />
-          <StatTile label="Customers" value={num(ov.customers)} />
-          <StatTile label="Stamps issued" value={num(ov.stamps)} />
-          <StatTile label="ARR" value={inr(ov.annualRecurringRevenue)} sub="annual recurring revenue" />
+          <div className={`${card} p-5`}>
+            <p className="text-[13px] text-[#9a948a]">Merchants</p>
+            <p className="font-head text-[32px] font-bold">{num(ov.tenants)}</p>
+            <p className="text-xs text-[#9a948a]"><span className="text-jade">{num(ov.activeTenants)} active</span> · {num(ov.trialTenants)} trial</p>
+          </div>
+          <div className={`${card} p-5`}>
+            <p className="text-[13px] text-[#9a948a]">Customers</p>
+            <p className="font-head text-[32px] font-bold">{num(ov.customers)}</p>
+          </div>
+          <div className={`${card} p-5`}>
+            <p className="text-[13px] text-[#9a948a]">Stamps issued</p>
+            <p className="font-head text-[32px] font-bold">{num(ov.stamps)}</p>
+            <p className="text-xs text-[#9a948a]">all-time</p>
+          </div>
+          <div className="rounded-2xl border-[1.5px] border-[#4a2f68] bg-[#241a2e] p-5">
+            <p className="text-[13px] text-[#c6a8e6]">MRR</p>
+            <p className="font-head text-[32px] font-bold text-lime">{inr(ov.annualRecurringRevenue)}</p>
+            <p className="text-xs text-[#c6a8e6]">monthly recurring revenue</p>
+          </div>
         </div>
 
-        <Card className="overflow-hidden">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-3">
-            <span className="font-semibold text-ink">Merchants — manage access</span>
+        <div className={`${card} overflow-hidden`}>
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b-[1.5px] border-[#2c2c2f] px-5 py-3.5">
+            <span className="font-head font-bold">Merchants — manage access</span>
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search by name…"
-              className="w-56 rounded-md border border-line bg-canvas px-3 py-1.5 text-sm outline-none focus:border-brand"
+              placeholder="Search merchants…"
+              className="w-64 rounded-[10px] border-[1.5px] border-[#2c2c2f] bg-[#141416] px-3.5 py-2 text-sm text-[#f4f2ee] outline-none placeholder:text-[#7a756d] focus:border-brand"
             />
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="border-b border-line bg-canvas text-left text-xs uppercase tracking-wide text-muted">
-                <tr><th className="px-4 py-3">Business</th><th className="px-4 py-3">Plan</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">KYC</th><th className="px-4 py-3">Branches</th><th className="px-4 py-3 text-right">Manage access</th></tr>
+              <thead className="border-b-[1.5px] border-[#2c2c2f] text-left text-[11.5px] font-semibold uppercase tracking-wide text-[#7a756d]">
+                <tr><th className="px-5 py-3">Business</th><th className="px-4 py-3">Plan</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">KYC</th><th className="px-4 py-3">Branches</th><th className="px-5 py-3 text-right">Manage access</th></tr>
               </thead>
               <tbody>
                 {tenants.filter((t) => t.name.toLowerCase().includes(q.toLowerCase())).map((t) => {
                   const closed = t.status === 'cancelled';
                   const suspended = t.status === 'suspended';
+                  const stTone = t.status === 'active' ? 'bg-[#12331f] text-[#5fd694]' : t.status === 'trial' ? 'bg-[#3a2f10] text-[#e6c860]' : suspended ? 'bg-[#3a1e1c] text-[#f08b83]' : 'bg-[#26262a] text-[#9a948a]';
                   return (
-                    <tr key={t.id} className="border-b border-line last:border-0 hover:bg-canvas">
-                      <td className="px-4 py-3 font-medium text-ink">{t.name}<span className="block text-xs font-normal text-muted">/{t.slug}</span></td>
-                      <td className="px-4 py-3 text-muted">{t.subscription?.plan?.name ?? 'Trial'}</td>
-                      <td className="px-4 py-3"><Badge tone={t.status === 'active' ? 'active' : t.status === 'trial' ? 'medium' : 'low'}>{t.status}</Badge></td>
-                      <td className="px-4 py-3">
+                    <tr key={t.id} className="border-b border-[#262629] last:border-0 hover:bg-[#232326]">
+                      <td className="px-5 py-3.5 font-semibold">{t.name}<span className="block text-xs font-normal text-[#7a756d]">/{t.slug}</span></td>
+                      <td className="px-4 py-3.5 text-[#c6c1b8]">{t.subscription?.plan?.name ?? 'Trial'}</td>
+                      <td className="px-4 py-3.5"><span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize ${stTone}`}>{t.status}</span></td>
+                      <td className="px-4 py-3.5">
                         {t.kycStatus === 'verified'
-                          ? <Badge tone="active">verified</Badge>
-                          : <button disabled={busy === t.id} onClick={() => verifyKyc(t.id)} className="text-xs text-brand hover:underline">Verify</button>}
+                          ? <span className="text-[13px] text-jade">✓ Verified</span>
+                          : <button disabled={busy === t.id} onClick={() => verifyKyc(t.id)} className="rounded-lg border-[1.5px] border-[#4a2f68] px-2.5 py-1 text-xs font-semibold text-[#c6a8e6] hover:bg-[#241a2e]">Verify</button>}
                       </td>
-                      <td className="px-4 py-3 text-muted">{t._count?.branches}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3.5 text-[#9a948a]">{t._count?.branches}</td>
+                      <td className="px-5 py-3.5">
                         <div className="flex justify-end gap-1.5">
                           {(suspended || closed) && (
-                            <button disabled={busy === t.id} onClick={() => setStatus(t.id, 'active')} className="rounded-md bg-success/10 px-2.5 py-1 text-xs font-medium text-success hover:bg-success/20">Activate</button>
+                            <button disabled={busy === t.id} onClick={() => setStatus(t.id, 'active')} className="rounded-lg bg-[#1c7a4d] px-2.5 py-1.5 text-xs font-semibold text-white hover:brightness-110">Activate</button>
                           )}
                           {!suspended && !closed && (
-                            <button disabled={busy === t.id} onClick={() => setStatus(t.id, 'suspended', `Pause ${t.name}? They will be locked out until reactivated.`)} className="rounded-md bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800 hover:bg-amber-200">Suspend</button>
+                            <button disabled={busy === t.id} onClick={() => setStatus(t.id, 'suspended', `Pause ${t.name}? They will be locked out until reactivated.`)} className="rounded-lg bg-[#9a7a12] px-2.5 py-1.5 text-xs font-semibold text-white hover:brightness-110">Suspend</button>
                           )}
                           {!closed && (
-                            <button disabled={busy === t.id} onClick={() => setStatus(t.id, 'cancelled', `Terminate ${t.name}? This closes the account permanently (data retained for records).`)} className="rounded-md bg-danger/10 px-2.5 py-1 text-xs font-medium text-danger hover:bg-danger/20">Terminate</button>
+                            <button disabled={busy === t.id} onClick={() => setStatus(t.id, 'cancelled', `Terminate ${t.name}? This closes the account permanently (data retained for records).`)} className="rounded-lg bg-[#d0362c] px-2.5 py-1.5 text-xs font-semibold text-white hover:brightness-110">Terminate</button>
                           )}
                         </div>
                       </td>
@@ -112,8 +139,8 @@ export default function AdminPage() {
               </tbody>
             </table>
           </div>
-        </Card>
-        <p className="text-xs text-muted">Suspend pauses a merchant instantly (they see a "contact us to reactivate" screen). Terminate closes the account. You collect payment via UPI and grant/renew access here.</p>
+          <p className="px-5 py-3.5 text-[12.5px] leading-relaxed text-[#7a756d]">Suspend pauses a merchant instantly; Terminate closes the account. Collect payment via UPI and grant / renew access here.</p>
+        </div>
       </main>
     </div>
   );

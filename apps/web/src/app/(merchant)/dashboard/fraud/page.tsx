@@ -25,7 +25,7 @@ export default function FraudPage() {
       <Card className="p-5">
         <h2 className="mb-4 font-semibold text-ink">Fraud alerts</h2>
         {!alerts ? <Spinner /> : alerts.length === 0 ? (
-          <EmptyState title="No fraud alerts 🎉" hint="Cooldowns, geo-fencing and velocity checks are running silently in the background." />
+          <EmptyState title="No fraud alerts" hint="Cooldowns, geo-fencing and velocity checks are running silently in the background." />
         ) : (
           <div className="space-y-2">
             {alerts.map((a) => (
@@ -48,17 +48,19 @@ export default function FraudPage() {
         <div className="border-b border-line px-4 py-3 font-semibold text-ink">Audit log</div>
         {audit.length === 0 ? <p className="p-6 text-center text-sm text-muted">No audit entries yet.</p> : (
           <div className="max-h-96 overflow-y-auto">
-            <table className="w-full text-sm">
-              <tbody>
-                {audit.map((l) => (
-                  <tr key={l.id} className="border-b border-line last:border-0">
-                    <td className="px-4 py-2.5 font-mono text-xs text-brand">{l.action}</td>
-                    <td className="px-4 py-2.5 text-muted">{l.target ?? ''}</td>
-                    <td className="px-4 py-2.5 text-right text-xs text-muted">{timeAgo(l.createdAt)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <tbody>
+                  {audit.map((l) => (
+                    <tr key={l.id} className="border-b border-line last:border-0">
+                      <td className="px-4 py-2.5 font-mono text-xs text-brand">{l.action}</td>
+                      <td className="px-4 py-2.5 text-muted">{l.target ?? ''}</td>
+                      <td className="px-4 py-2.5 text-right text-xs text-muted">{timeAgo(l.createdAt)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </Card>

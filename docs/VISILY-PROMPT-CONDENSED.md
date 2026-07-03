@@ -1,6 +1,6 @@
 # Visily Prompt — Condensed (< 4000 words, single paste)
 
-Design a SaaS product called **Loyalty OS** — a QR-based digital loyalty platform for local
+Design a SaaS product called **Rewrd** — a QR-based digital loyalty platform for local
 businesses (cafés, salons, gyms, bakeries, restaurants, boutiques, car washes). Customers scan a QR
 after a visit, collect digital stamps on their phone with **no app install**, and unlock free
 rewards. Merchants manage everything from a dashboard; a platform operator grants/suspends access.
@@ -12,7 +12,7 @@ There is **no self-serve checkout** (billing is offline via UPI; access is opera
 Generate these screens across 4 surfaces:
 
 ## A) Marketing website (desktop, responsive)
-1. **Landing** — sticky nav (logo "Loyalty OS"; links Features, How it works, Pricing, Customer app;
+1. **Landing** — sticky nav (logo "Rewrd"; links Features, How it works, Pricing, Customer app;
    buttons Log in, Start free trial). Hero 2-col: H1 "Turn every visit into a repeat customer",
    subtext about launching a QR loyalty program in minutes with no app download, buttons "Start free
    trial"/"View live demo", note "30-day free trial. No payment required to start."; right side a
@@ -29,7 +29,7 @@ Generate these screens across 4 surfaces:
    Cards/Reviews & Social). Pricing teaser 4 mini cards: Basic ₹999/yr (1 location), Growth ₹2,499/yr
    (up to 3), Pro ₹4,999/yr (up to 6), Enterprise Custom. FAQ accordion (7 items). Final CTA band
    "Start building customer loyalty in minutes" (buttons Start free trial / Book a demo). Footer.
-2. **Role select** — centered, H1 "Welcome — how will you use Loyalty OS?"; two choice cards: "I'm a
+2. **Role select** — centered, H1 "Welcome — how will you use Rewrd?"; two choice cards: "I'm a
    Business" (button Start 30-day free trial, secondary I already have an account, note No card
    required) and "I'm a Customer" (text: usually you just scan the QR at the counter — no app, no
    signup; buttons Open my rewards / How does scanning work; note Free forever for customers).
@@ -90,7 +90,7 @@ status chip (Trial/Active), user name+role+avatar, Log out.
     notification prefs, data & privacy (export, deletion), danger zone.
 18. **Account paused/closed (lock state)** — full-screen centered card (replaces dashboard when
     operator suspends/terminates): icon, H1 "Account paused" or "Account closed", explanation,
-    "Contact Loyalty OS" button, Log out.
+    "Contact Rewrd" button, Log out.
 
 ## C) Customer app (mobile, portrait ~390px, bottom tabs: Home, Wallet, Offers, Account)
 19. **Login (OTP)** — phone input + Send code, then 6-digit OTP + Verify; copy "We'll text you a
@@ -111,7 +111,7 @@ status chip (Trial/Active), user name+role+avatar, Log out.
     toggle, "Download my data", "Delete my account", referral link + share, Log out.
 
 ## D) Operator admin console (desktop)
-26. **Admin overview** — top bar "Loyalty OS · Platform Admin"; KPI tiles: Merchants (active/trial
+26. **Admin overview** — top bar "Rewrd · Platform Admin"; KPI tiles: Merchants (active/trial
     split), Customers, Stamps issued.
 27. **Merchants — manage access** — search; table (business name+slug, plan, status badge
     Trial/Active/Suspended/Cancelled, KYC with Verify action, branches count) + a Manage-access

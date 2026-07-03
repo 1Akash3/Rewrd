@@ -58,7 +58,7 @@ billingRouter.post(
       data: {
         tenantId, number: `INV-${new Date().getFullYear()}-${String(count + 1).padStart(5, '0')}`,
         amount, gstAmount: gst, status: 'paid', paidAt: new Date(),
-        lineItems: toJson([{ desc: `${plan.name} plan — annual`, amount }, { desc: 'GST @ 18%', amount: gst }]),
+        lineItems: toJson([{ desc: `${plan.name} plan — monthly`, amount }, { desc: 'GST @ 18%', amount: gst }]),
       },
     });
     await audit({ tenantId, action: 'billing.subscribe', target: plan.code });

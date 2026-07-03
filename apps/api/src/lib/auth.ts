@@ -4,7 +4,7 @@ import { env } from '../config/env.js';
 
 export type Principal =
   | { kind: 'user'; id: string; tenantId: string | null; role: string; branchId: string | null }
-  | { kind: 'customer'; id: string; phone: string };
+  | { kind: 'customer'; id: string; email: string | null };
 
 export function signToken(principal: Principal): string {
   // Customers get a long-lived session (stay logged in across visits); merchant

@@ -1,4 +1,4 @@
-# Loyalty OS — QR-first Digital Loyalty Platform
+# Rewrd — QR-first Digital Loyalty Platform
 
 A production-shaped, multi-tenant **B2B SaaS** loyalty platform for local businesses
 (cafés, salons, gyms, bakeries, restaurants, boutiques, car washes). Merchants pay a
@@ -72,7 +72,7 @@ Open **http://localhost:3000**.
 |---|---|
 | Merchant owner | `owner@brewbean.dev` / `owner1234` |
 | Staff/cashier | `staff@brewbean.dev` / `staff1234` |
-| Super admin | `admin@loyaltyos.dev` / `admin1234` → `/admin` |
+| Super admin | `admin@rewrd.dev` / `admin1234` → `/admin` |
 | Customer | phone `+919999900001` — OTP is echoed on screen in dev |
 
 ### Try the flow

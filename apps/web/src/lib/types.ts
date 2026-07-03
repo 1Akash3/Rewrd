@@ -10,6 +10,8 @@ export interface Tenant {
   brandColor?: string;
   logoUrl?: string | null;
   status?: string;
+  reviewLink?: string | null;
+  instagram?: string | null;
 }
 
 export interface MerchantUser {
@@ -101,6 +103,7 @@ export interface CrmCustomer {
   tag: string;
   lastVisit: string | null;
   consent: boolean;
+  progress?: { campaignName: string; stamps: number; required: number }[];
 }
 
 export interface Plan {

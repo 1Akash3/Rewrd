@@ -20,11 +20,15 @@ async function main() {
     await prisma.subscriptionPlan.upsert({ where: { code: p.code }, update: { ...p, features: toJson(p.features) }, create: { ...p, features: toJson(p.features) } });
   }
 
-  // Platform super admin.
+  // Platform super admin — the ONLY operator login. Credentials come from
+  // ADMIN_EMAIL / ADMIN_PASSWORD env vars so the owner can set their own
+  // private values; the defaults are for local dev only.
+  const adminEmail = process.env.ADMIN_EMAIL ?? 'admin@rewrd.dev';
+  const adminPassword = process.env.ADMIN_PASSWORD ?? 'admin1234';
   await prisma.user.upsert({
-    where: { email: 'admin@loyaltyos.dev' },
-    update: {},
-    create: { role: 'superadmin', name: 'Platform Admin', email: 'admin@loyaltyos.dev', passwordHash: await bcrypt.hash('admin1234', 10) },
+    where: { email: adminEmail },
+    update: { passwordHash: await bcrypt.hash(adminPassword, 10) },
+    create: { role: 'superadmin', name: 'Platform Admin', email: adminEmail, passwordHash: await bcrypt.hash(adminPassword, 10) },
   });
 
   // Clear + recreate demo tenant.
@@ -59,12 +63,14 @@ async function main() {
       stampsRequired: 8, rewardTitle: 'Free coffee', rewardDetail: 'Any regular coffee on the house', cooldownMinutes: 30, perCustomerDailyLimit: 2,
     },
   });
-  const qr = await prisma.qRCode.create({ data: { tenantId: tenant.id, campaignId: campaign.id, branchId: tenant.branches[0].id, label: 'MG Road — Store QR', kind: 'store' } });
+  // ONE QR per store: intentionally NOT bound to a campaign, so scanning it
+  // lists every live offer and the customer picks which coupon to add.
+  const qr = await prisma.qRCode.create({ data: { tenantId: tenant.id, branchId: tenant.branches[0].id, label: 'Store QR — all offers', kind: 'store' } });
 
   // Demo customer with progress.
   const customer = await prisma.customer.upsert({
-    where: { phone: '+919999900001' }, update: { name: 'Neha Customer' },
-    create: { phone: '+919999900001', name: 'Neha Customer', consentAt: new Date() },
+    where: { email: 'neha@example.com' }, update: { name: 'Neha Customer' },
+    create: { email: 'neha@example.com', phone: '+919999900001', name: 'Neha Customer', consentAt: new Date() },
   });
   const card = await prisma.stampCard.create({ data: { customerId: customer.id, campaignId: campaign.id, stamps: 5, lastStampAt: new Date() } });
   for (let i = 0; i < 5; i++) {
@@ -74,8 +80,8 @@ async function main() {
   console.log('\nSeed complete. Demo logins:');
   console.log('  Merchant owner : owner@brewbean.dev / owner1234');
   console.log('  Staff          : staff@brewbean.dev / staff1234');
-  console.log('  Super admin    : admin@loyaltyos.dev / admin1234');
-  console.log('  Customer phone : +919999900001 (OTP echoed in dev)');
+  console.log(`  Super admin    : ${adminEmail} / ${adminPassword === 'admin1234' ? 'admin1234 (dev default — set ADMIN_PASSWORD!)' : '(from ADMIN_PASSWORD)'}`);
+  console.log('  Customer email : neha@example.com (email OTP echoed in dev)');
   console.log(`  Demo QR token  : ${qr.token}\n`);
 }
 
