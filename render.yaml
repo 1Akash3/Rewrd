@@ -8,7 +8,9 @@ services:
     region: singapore # closest to India; change if you deploy elsewhere
     plan: free
     rootDir: apps/api
-    buildCommand: cd ../.. && npm ci && npm run build -w @loyalty/api
+    # --include=dev is required: NODE_ENV=production below makes npm skip
+    # devDependencies by default, but the build needs typescript/prisma/@types/node.
+    buildCommand: cd ../.. && npm ci --include=dev && npm run build -w @loyalty/api
     startCommand: npm run start
     healthCheckPath: /health
     envVars:
