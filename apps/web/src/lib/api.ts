@@ -106,6 +106,7 @@ export const merchantApi = {
 
   branches: () => api.get<any[]>('/branches', 'merchant'),
   createBranch: (b: any) => api.post<any>('/branches', b, 'merchant'),
+  updateBranch: (id: string, b: any) => api.patch<any>(`/branches/${id}`, b, 'merchant'),
   leaderboard: () => api.get<any[]>('/branches/leaderboard', 'merchant'),
 
   staff: () => api.get<any[]>('/staff', 'merchant'),
