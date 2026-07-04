@@ -1,6 +1,9 @@
 // End-to-end smoke test of the core loyalty loop against a live server.
 // Run: `npm run test` (expects `npm run db:setup` to have been run first).
+// Self-cleaning: the Test Cafe tenant + test customer are deleted at the end
+// so repeated runs never accumulate junk in the database.
 import { createApp } from '../app.js';
+import { prisma } from '../db/prisma.js';
 
 const PORT = 4555;
 const base = `http://localhost:${PORT}/api`;
@@ -41,10 +44,10 @@ async function run() {
     assert(camp.status === 201 && camp.json.data?.id, 'campaign created');
     const campaignId = camp.json.data.id;
 
-    // 3) Fetch its auto-provisioned QR
+    // 3) The branch's evergreen QR (one QR per branch; GET self-provisions)
     const qrs = await j('GET', '/qr', undefined, mToken);
-    const qr = qrs.json.data.find((q: any) => q.campaignId === campaignId);
-    assert(!!qr?.token, 'campaign has an auto-provisioned QR');
+    const qr = qrs.json.data[0];
+    assert(!!qr?.token && !qr?.campaignId, 'branch has one evergreen store QR');
 
     // 4) Public resolve of the QR
     const resolve = await j('GET', `/public/resolve/${qr.token}`);
@@ -81,17 +84,24 @@ async function run() {
     const overview = await j('GET', '/analytics/overview', undefined, mToken);
     assert(overview.json.data?.rewardsClaimed >= 1, 'analytics overview counts the claim');
 
-    // 10) Fraud: cooldown blocks a too-fast stamp
+    // 10) Fraud: cooldown blocks a too-fast stamp (same branch QR, new campaign)
     const camp2 = await j('POST', '/campaigns', { name: 'Cooldown test', stampsRequired: 5, rewardTitle: 'Free item', cooldownMinutes: 60, perCustomerDailyLimit: 10 }, mToken);
-    const qrs2 = await j('GET', '/qr', undefined, mToken);
-    const qr2 = qrs2.json.data.find((q: any) => q.campaignId === camp2.json.data.id);
-    const e1 = await j('POST', '/stamps/earn', { token: qr2.token, campaignId: camp2.json.data.id, deviceFp: fp2 }, cToken);
-    const e2 = await j('POST', '/stamps/earn', { token: qr2.token, campaignId: camp2.json.data.id, deviceFp: fp2 }, cToken);
+    const e1 = await j('POST', '/stamps/earn', { token: qr.token, campaignId: camp2.json.data.id, deviceFp: fp2 }, cToken);
+    const e2 = await j('POST', '/stamps/earn', { token: qr.token, campaignId: camp2.json.data.id, deviceFp: fp2 }, cToken);
     assert(e1.status === 201 && e2.status === 400, 'cooldown blocks rapid second stamp');
+
+    // 11) Clean up everything this run created.
+    const me = await j('GET', '/auth/me', undefined, mToken);
+    const testTenantId = me.json.data?.tenant?.id;
+    if (testTenantId) await prisma.tenant.delete({ where: { id: testTenantId } });
+    await prisma.customer.deleteMany({ where: { email: custEmail } });
+    await prisma.otpChallenge.deleteMany({ where: { email: custEmail } });
+    console.log('  (test data cleaned up)');
 
     console.log(`\nResult: ${passed} passed, ${failed} failed\n`);
   } finally {
     server.close();
+    await prisma.$disconnect();
   }
   process.exit(failed === 0 ? 0 : 1);
 }

@@ -39,6 +39,9 @@ export default function LoginPage() {
       </form>
       <GoogleSignIn label="signin_with" />
       <p className="mt-4 text-center text-sm text-muted">New here? <Link href="/signup" className="font-semibold text-brand">Start a free trial</Link></p>
+      <div className="mt-5 rounded-2xl border-[1.5px] border-line bg-canvas px-4 py-3 text-center text-sm text-muted">
+        Looking for your stamp cards? <Link href="/app" className="font-semibold text-brand">Customer sign in →</Link>
+      </div>
     </div>
   );
 }

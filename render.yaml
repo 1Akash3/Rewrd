@@ -26,6 +26,10 @@ services:
         sync: false
       - key: API_BASE_URL
         value: https://api.rewrd.online
+      # QR codes encode WEB_BASE_URL/s/<token> — without this they point at
+      # localhost. Must be the customer-facing web app origin.
+      - key: WEB_BASE_URL
+        value: https://www.rewrd.online
       - key: CORS_ORIGINS
         value: https://rewrd.online,https://www.rewrd.online
       - key: ADMIN_EMAIL

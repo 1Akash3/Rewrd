@@ -85,16 +85,17 @@ export const merchantApi = {
   createCampaign: (b: Partial<Campaign>) => api.post<Campaign>('/campaigns', b, 'merchant'),
   updateCampaign: (id: string, b: Partial<Campaign>) => api.patch<Campaign>(`/campaigns/${id}`, b, 'merchant'),
 
+  // One evergreen QR per branch — GET is self-provisioning, nothing to create.
   qrCodes: () => api.get<QRCode[]>('/qr', 'merchant'),
-  createQr: (b: { label: string; kind: string; branchId?: string; campaignId?: string }) => api.post<QRCode>('/qr', b, 'merchant'),
 
   pendingApprovals: () => api.get<any[]>('/stamps/pending', 'merchant'),
   approveStamp: (eventId: string) => api.post<any>(`/stamps/${eventId}/approve`, {}, 'merchant'),
 
-  overview: () => api.get<Overview>('/analytics/overview', 'merchant'),
-  trend: () => api.get<{ date: string; scans: number }[]>('/analytics/trend', 'merchant'),
-  breakdown: () => api.get<{ newUsers: number; returning: number; popularHours: { hour: number; count: number }[] }>('/analytics/breakdown', 'merchant'),
-  topCampaigns: () => api.get<{ id: string; name: string; stamps: number; rewards: number; customers: number }[]>('/analytics/campaigns', 'merchant'),
+  // All analytics endpoints accept an optional branchId for per-branch drill-down.
+  overview: (branchId?: string) => api.get<Overview>(`/analytics/overview${branchId ? `?branchId=${branchId}` : ''}`, 'merchant'),
+  trend: (branchId?: string) => api.get<{ date: string; scans: number }[]>(`/analytics/trend${branchId ? `?branchId=${branchId}` : ''}`, 'merchant'),
+  breakdown: (branchId?: string) => api.get<{ newUsers: number; returning: number; popularHours: { hour: number; count: number }[] }>(`/analytics/breakdown${branchId ? `?branchId=${branchId}` : ''}`, 'merchant'),
+  topCampaigns: (branchId?: string) => api.get<{ id: string; name: string; stamps: number; rewards: number; customers: number }[]>(`/analytics/campaigns${branchId ? `?branchId=${branchId}` : ''}`, 'merchant'),
 
   customers: (segment?: string) => api.get<CrmCustomer[]>(`/crm/customers${segment ? `?segment=${segment}` : ''}`, 'merchant'),
   segments: () => api.get<{ total: number; counts: Record<string, number> }>('/crm/segments', 'merchant'),

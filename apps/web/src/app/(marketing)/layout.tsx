@@ -4,17 +4,26 @@ import { Logo } from '@/components/ui';
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen overflow-x-hidden">
-      {/* Sticky pill nav */}
-      <div className="sticky top-0 z-50 flex justify-center bg-gradient-to-b from-canvas via-canvas/80 to-transparent px-6 py-4 backdrop-blur-sm">
-        <nav className="flex w-full max-w-6xl items-center gap-5 rounded-full border-2 border-ink bg-surface py-2.5 pl-5 pr-3 shadow-hard">
-          <Link href="/" className="flex flex-1 items-center"><Logo /></Link>
-          <div className="hidden items-center gap-1 rounded-full bg-brand-soft p-1 md:flex">
-            <Link href="/" className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white">For businesses</Link>
-            <Link href="/app" className="rounded-full px-4 py-2 text-sm font-semibold text-ink">For customers</Link>
+      {/* Sticky pill nav. On mobile the business/customer switch gets its own
+          row — hiding it was leaving phone users with no way to tell the two
+          logins apart. */}
+      <div className="sticky top-0 z-50 flex justify-center bg-gradient-to-b from-canvas via-canvas/80 to-transparent px-4 py-4 backdrop-blur-sm sm:px-6">
+        <nav className="w-full max-w-6xl rounded-[28px] border-2 border-ink bg-surface px-4 py-2.5 shadow-hard md:rounded-full md:pl-5 md:pr-3">
+          <div className="flex items-center gap-3">
+            <Link href="/" className="flex flex-1 items-center"><Logo size="sm" /></Link>
+            <div className="hidden items-center gap-1 rounded-full bg-brand-soft p-1 md:flex">
+              <Link href="/" className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white">For businesses</Link>
+              <Link href="/app" className="rounded-full px-4 py-2 text-sm font-semibold text-ink">For customers</Link>
+            </div>
+            <div className="flex items-center gap-1.5 sm:gap-2.5">
+              <Link href="/login" className="px-2 py-2 text-sm font-semibold text-ink hover:text-brand sm:px-3.5">Log in</Link>
+              <Link href="/start" className="btn-brand !px-4 !py-2 text-[13px] sm:!py-2.5 sm:text-sm">Start free trial</Link>
+            </div>
           </div>
-          <div className="flex items-center gap-2.5">
-            <Link href="/login" className="px-3.5 py-2 text-sm font-semibold text-ink hover:text-brand">Log in</Link>
-            <Link href="/start" className="btn-brand !py-2.5 text-sm">Start free trial <span aria-hidden>→</span></Link>
+          {/* Mobile-only switch row: makes "which login am I?" obvious. */}
+          <div className="mt-2 flex items-center gap-1 rounded-full bg-brand-soft p-1 md:hidden">
+            <Link href="/" className="flex-1 rounded-full bg-ink px-3 py-1.5 text-center text-[13px] font-semibold text-white">For businesses</Link>
+            <Link href="/app" className="flex-1 rounded-full px-3 py-1.5 text-center text-[13px] font-semibold text-ink">For customers</Link>
           </div>
         </nav>
       </div>

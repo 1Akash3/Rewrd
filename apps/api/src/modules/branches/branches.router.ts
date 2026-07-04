@@ -41,6 +41,8 @@ branchesRouter.post(
   asyncHandler(async (req, res) => {
     const body = validate(branchSchema, req.body);
     const b = await prisma.branch.create({ data: { tenantId: tid(req), ...body } });
+    // Every branch gets its one evergreen store QR the moment it exists.
+    await prisma.qRCode.create({ data: { tenantId: tid(req), branchId: b.id, label: `${b.name} — Store QR`, kind: 'store' } });
     await audit({ tenantId: tid(req), action: 'branch.create', target: b.id });
     ok(res, b, 201);
   }),

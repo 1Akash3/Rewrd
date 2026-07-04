@@ -22,6 +22,14 @@ export function OffersMap({ center, offers, radiusM = 5000 }:
       const map = L.map(boxRef.current, { zoomControl: false, attributionControl: true });
       mapRef.current = map;
       map.setView([center.lat, center.lng], 14);
+      // Leaflet measures its container at init; on mobile (and inside anything
+      // still laying out) that measurement is stale and tiles render gray or
+      // misaligned. Re-measure after layout settles + whenever the box resizes.
+      setTimeout(() => map.invalidateSize(), 150);
+      setTimeout(() => map.invalidateSize(), 600);
+      const ro = new ResizeObserver(() => map.invalidateSize());
+      ro.observe(boxRef.current);
+      map.on('unload', () => ro.disconnect());
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',

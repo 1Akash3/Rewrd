@@ -1,9 +1,11 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import type { Circle, Map as LeafletMap, Marker } from 'leaflet';
-import { LocateFixed } from 'lucide-react';
+import { LocateFixed, MapPin, Search } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 import { getGeo } from '@/lib/device';
+
+type SearchHit = { label: string; lat: number; lng: number };
 
 // Click-to-set branch location picker — Leaflet + OpenStreetMap (free, no
 // key). Tap the map (or drag the pin) to set coordinates; the translucent
@@ -23,6 +25,34 @@ export function LocationPicker({ value, radiusM = 250, onChange }: {
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
   const [locating, setLocating] = useState(false);
+
+  // Address search via Nominatim (OpenStreetMap's free geocoder, no key) —
+  // typing "MG Road Bengaluru" beats panning a country-level map by hand.
+  const [q, setQ] = useState('');
+  const [hits, setHits] = useState<SearchHit[]>([]);
+  const [searching, setSearching] = useState(false);
+  useEffect(() => {
+    if (q.trim().length < 3) { setHits([]); return; }
+    const t = setTimeout(async () => {
+      setSearching(true);
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&countrycodes=in&q=${encodeURIComponent(q)}`,
+          { headers: { accept: 'application/json' } },
+        );
+        const data = await res.json();
+        setHits((data as any[]).map((d) => ({ label: d.display_name, lat: +d.lat, lng: +d.lon })));
+      } catch { setHits([]); }
+      setSearching(false);
+    }, 450);
+    return () => clearTimeout(t);
+  }, [q]);
+
+  function pickHit(h: SearchHit) {
+    setHits([]);
+    setQ(h.label.split(',').slice(0, 2).join(','));
+    onChangeRef.current(+h.lat.toFixed(6), +h.lng.toFixed(6));
+  }
 
   // Place (or move) the pin + geofence circle. Defined against refs so both
   // the init effect and the prop-sync effect can share it.
@@ -64,6 +94,13 @@ export function LocationPicker({ value, radiusM = 250, onChange }: {
       const map = L.map(boxRef.current, { zoomControl: true, attributionControl: true });
       mapRef.current = map;
       map.setView(value ? [value.lat, value.lng] : INDIA_CENTER, value ? 16 : 5);
+      // Re-measure after layout settles — the form containing this picker
+      // animates open, so the first measurement is often stale (gray tiles).
+      setTimeout(() => map.invalidateSize(), 150);
+      setTimeout(() => map.invalidateSize(), 600);
+      const ro = new ResizeObserver(() => map.invalidateSize());
+      ro.observe(boxRef.current);
+      map.on('unload', () => ro.disconnect());
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -97,6 +134,33 @@ export function LocationPicker({ value, radiusM = 250, onChange }: {
 
   return (
     <div>
+      {/* Search-first: type the area, then fine-tune by tapping/dragging. */}
+      <div className="relative mb-2.5">
+        <Search size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" aria-hidden />
+        <input
+          className="input !pl-10"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Search your store's area — e.g. MG Road, Bengaluru"
+          aria-label="Search location"
+        />
+        {(hits.length > 0 || searching) && (
+          <div className="absolute inset-x-0 top-full z-[600] mt-1.5 overflow-hidden rounded-2xl border-2 border-ink bg-surface shadow-hard-sm">
+            {searching && hits.length === 0 && <p className="px-4 py-2.5 text-sm text-muted">Searching…</p>}
+            {hits.map((h) => (
+              <button
+                key={`${h.lat},${h.lng}`}
+                type="button"
+                onClick={() => pickHit(h)}
+                className="flex w-full items-start gap-2 border-b border-line px-3.5 py-2.5 text-left text-sm text-ink last:border-0 hover:bg-brand-soft"
+              >
+                <MapPin size={14} className="mt-0.5 flex-shrink-0 text-brand" aria-hidden />
+                <span className="line-clamp-2">{h.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
       <div className="relative overflow-hidden rounded-2xl border-2 border-ink shadow-hard-sm">
         <div ref={boxRef} className="h-[300px] w-full bg-[#E4EBE2]" />
         <button

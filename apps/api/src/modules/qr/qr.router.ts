@@ -1,9 +1,8 @@
 import { Router } from 'express';
-import { z } from 'zod';
 import { prisma } from '../../db/prisma.js';
 import { notFound } from '../../lib/errors.js';
 import { audit } from '../../lib/events.js';
-import { asyncHandler, ok, validate } from '../../lib/http.js';
+import { asyncHandler, ok } from '../../lib/http.js';
 import { qrDataUrl, qrSvg, scanUrl } from '../../lib/qr.js';
 import { requireRole } from '../../middleware/auth.js';
 import type { Request } from 'express';
@@ -16,37 +15,34 @@ function tenantId(req: Request): string {
   return p.tenantId;
 }
 
-// ---- Merchant-managed QR inventory (auth required) ----
+// ---- Merchant QR codes: exactly ONE evergreen QR per branch ----
+// The QR is unbound (no campaignId), so scanning it always lists whatever
+// offers are live — merchants never reprint when campaigns change. GET is
+// self-healing: it provisions the QR for any branch that lacks one.
 qrRouter.get(
   '/',
   requireRole('owner', 'branch_manager', 'staff'),
   asyncHandler(async (req, res) => {
-    const items = await prisma.qRCode.findMany({
-      where: { tenantId: tenantId(req) },
-      include: { branch: true, campaign: { select: { id: true, name: true } } },
-      orderBy: { createdAt: 'desc' },
-    });
-    ok(res, items.map((q) => ({ ...q, scanUrl: scanUrl(q.token) })));
-  }),
-);
-
-qrRouter.post(
-  '/',
-  requireRole('owner', 'branch_manager'),
-  asyncHandler(async (req, res) => {
-    const body = validate(
-      z.object({
-        label: z.string().min(1).default('Store QR'),
-        kind: z.enum(['store', 'shared', 'table', 'counter', 'bill', 'staff']).default('store'),
-        branchId: z.string().optional(),
-        campaignId: z.string().optional(),
-      }),
-      req.body,
-    );
     const tid = tenantId(req);
-    const qr = await prisma.qRCode.create({ data: { tenantId: tid, ...body } });
-    await audit({ tenantId: tid, action: 'qr.create', target: qr.id });
-    ok(res, { ...qr, scanUrl: scanUrl(qr.token) }, 201);
+    const branches = await prisma.branch.findMany({
+      where: { tenantId: tid, status: 'active' },
+      orderBy: { createdAt: 'asc' },
+    });
+    const items = [];
+    for (const b of branches) {
+      let qr = await prisma.qRCode.findFirst({
+        where: { tenantId: tid, branchId: b.id, campaignId: null, kind: 'store', status: 'active' },
+        orderBy: { createdAt: 'asc' },
+      });
+      if (!qr) {
+        qr = await prisma.qRCode.create({
+          data: { tenantId: tid, branchId: b.id, label: `${b.name} — Store QR`, kind: 'store' },
+        });
+        await audit({ tenantId: tid, action: 'qr.provision', target: qr.id });
+      }
+      items.push({ ...qr, branch: b, scanUrl: scanUrl(qr.token) });
+    }
+    ok(res, items);
   }),
 );
 

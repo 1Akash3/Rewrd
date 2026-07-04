@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useState } from 'react';
 import { ArrowLeft, Mail, ShieldCheck } from 'lucide-react';
 import { customerApi, tokens } from '@/lib/api';
@@ -83,6 +84,9 @@ export function CustomerLogin({ onDone, heading = 'Sign in to your rewards' }: {
           </div>
         </form>
       )}
+      <p className="mt-6 text-center text-xs text-muted">
+        Run a business? <Link href="/login" className="font-semibold text-brand">Business login →</Link>
+      </p>
     </div>
   );
 }

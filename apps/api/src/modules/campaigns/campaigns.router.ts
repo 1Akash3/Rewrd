@@ -62,8 +62,8 @@ campaignsRouter.post(
         endAt: body.endAt ? new Date(body.endAt) : undefined,
       },
     });
-    // Auto-provision a store QR for the new campaign.
-    await prisma.qRCode.create({ data: { tenantId: tid, campaignId: campaign.id, label: `${campaign.name} — Store QR`, kind: 'store' } });
+    // No per-campaign QR: the model is ONE QR per branch (see qr.router) —
+    // scanning a branch QR lists every live offer, including this new one.
     await audit({ tenantId: tid, actorId: req.principal!.kind === 'user' ? req.principal!.id : null, action: 'campaign.create', target: campaign.id });
     await track('campaign_created', { tenantId: tid, campaignId: campaign.id, props: { type: campaign.type } });
     ok(res, campaign, 201);

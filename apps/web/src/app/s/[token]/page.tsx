@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { BadgePlus, Check, CircleAlert, Clock, Gift, MapPin } from 'lucide-react';
+import { BadgePlus, Camera, Check, CircleAlert, Clock, Gift, MapPin, Star } from 'lucide-react';
 import { customerApi, tokens } from '@/lib/api';
 import { deviceFp, getGeo } from '@/lib/device';
 import { useCustomer } from '@/lib/useCustomer';
@@ -142,7 +142,7 @@ export default function ScanPage({ params }: { params: { token: string } }) {
                           rel="noreferrer"
                           className="btn-outline flex items-center justify-center gap-2 !py-2 text-xs font-semibold hover:bg-white"
                         >
-                          ⭐ Leave a Google Review
+                          <Star size={14} aria-hidden /> Leave a Google Review
                         </a>
                       )}
                       {ctx.tenant.instagram && (
@@ -152,7 +152,7 @@ export default function ScanPage({ params }: { params: { token: string } }) {
                           rel="noreferrer"
                           className="btn-outline flex items-center justify-center gap-2 !py-2 text-xs font-semibold hover:bg-white"
                         >
-                          📸 Follow us on Instagram
+                          <Camera size={14} aria-hidden /> Follow us on Instagram
                         </a>
                       )}
                     </div>
